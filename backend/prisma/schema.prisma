@@ -1,0 +1,202 @@
+// Modelo de datos del Hito 1 (ver docs/diagramas/entidad-relacion.png).
+// Cada modelo es una tabla en PostgreSQL; las relaciones crean las claves foráneas.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  JUGADOR
+  VENDEDOR
+  ADMIN
+}
+
+enum EstadoLocal {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+enum ModoCobro {
+  TOTAL
+  ADELANTO
+}
+
+enum TipoFoto {
+  ENTRADA
+  CANCHA
+}
+
+enum TipoCancha {
+  FUTBOL_5
+  FUTBOL_7
+  OTRO
+}
+
+enum TipoDia {
+  SEMANA
+  FIN_DE_SEMANA
+}
+
+enum OrigenReserva {
+  WEB
+  LOCAL
+}
+
+enum EstadoReserva {
+  PENDIENTE_PAGO
+  CONFIRMADA
+  CANCELADA
+  EXPIRADA
+  COMPLETADA
+  NO_ASISTIO
+}
+
+enum MetodoPago {
+  YAPE
+  TARJETA
+}
+
+enum EstadoPago {
+  APROBADO
+  RECHAZADO
+  DEVUELTO
+}
+
+model Usuario {
+  id            Int       @id @default(autoincrement())
+  nombre        String    @db.VarChar(100)
+  correo        String    @unique @db.VarChar(120)
+  celular       String    @db.VarChar(15)
+  passwordHash  String?   @map("password_hash") // vacío si ingresa con Google
+  googleId      String?   @unique @map("google_id")
+  rol           Rol       @default(JUGADOR)
+  inasistencias Int       @default(0) // con 3 se exige pago total (RN08)
+  activo        Boolean   @default(true)
+  creadoEn      DateTime  @default(now()) @map("creado_en")
+  locales       Local[]
+  reservas      Reserva[]
+
+  @@map("usuario")
+}
+
+model Local {
+  id           Int               @id @default(autoincrement())
+  vendedorId   Int               @map("vendedor_id")
+  nombre       String            @db.VarChar(100)
+  direccion    String            @db.VarChar(150)
+  distrito     String            @db.VarChar(60)
+  latitud      Decimal           @db.Decimal(9, 6)
+  longitud     Decimal           @db.Decimal(9, 6)
+  precisionGps Int               @map("precision_gps") // metros; se acepta hasta 50
+  modoCobro    ModoCobro         @default(ADELANTO) @map("modo_cobro")
+  estado       EstadoLocal       @default(PENDIENTE) // solo APROBADO sale en el mapa (RN09)
+  creadoEn     DateTime          @default(now()) @map("creado_en")
+  vendedor     Usuario           @relation(fields: [vendedorId], references: [id])
+  fotos        FotoLocal[]
+  horarios     HorarioAtencion[]
+  canchas      Cancha[]
+
+  @@map("local")
+}
+
+model FotoLocal {
+  id      Int      @id @default(autoincrement())
+  localId Int      @map("local_id")
+  url     String
+  tipo    TipoFoto
+  local   Local    @relation(fields: [localId], references: [id], onDelete: Cascade)
+
+  @@map("foto_local")
+}
+
+model HorarioAtencion {
+  id           Int    @id @default(autoincrement())
+  localId      Int    @map("local_id")
+  diaSemana    Int    @map("dia_semana") // 0 = domingo ... 6 = sábado
+  horaApertura String @map("hora_apertura") @db.VarChar(5) // "08:00"
+  horaCierre   String @map("hora_cierre") @db.VarChar(5) // "23:00"
+  local        Local  @relation(fields: [localId], references: [id], onDelete: Cascade)
+
+  @@unique([localId, diaSemana])
+  @@map("horario_atencion")
+}
+
+model Cancha {
+  id         Int        @id @default(autoincrement())
+  localId    Int        @map("local_id")
+  nombre     String     @db.VarChar(60)
+  tipo       TipoCancha @default(FUTBOL_5)
+  superficie String     @db.VarChar(40)
+  activa     Boolean    @default(true)
+  local      Local      @relation(fields: [localId], references: [id], onDelete: Cascade)
+  tarifas    Tarifa[]
+  bloqueos   Bloqueo[]
+  reservas   Reserva[]
+
+  @@map("cancha")
+}
+
+model Tarifa {
+  id         Int     @id @default(autoincrement())
+  canchaId   Int     @map("cancha_id")
+  tipoDia    TipoDia @map("tipo_dia")
+  horaInicio String  @map("hora_inicio") @db.VarChar(5)
+  horaFin    String  @map("hora_fin") @db.VarChar(5)
+  precio     Decimal @db.Decimal(8, 2)
+  cancha     Cancha  @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+
+  @@map("tarifa")
+}
+
+model Bloqueo {
+  id       Int      @id @default(autoincrement())
+  canchaId Int      @map("cancha_id")
+  inicio   DateTime
+  fin      DateTime
+  motivo   String?  @db.VarChar(100)
+  cancha   Cancha   @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+
+  @@map("bloqueo")
+}
+
+model Reserva {
+  id            Int           @id @default(autoincrement())
+  codigo        String        @unique @db.VarChar(10)
+  canchaId      Int           @map("cancha_id")
+  jugadorId     Int?          @map("jugador_id") // vacío en ventas registradas en el local
+  nombreCliente String?       @map("nombre_cliente") @db.VarChar(100)
+  inicio        DateTime
+  fin           DateTime
+  total         Decimal       @db.Decimal(8, 2) // los montos los calcula el servidor (RN06)
+  adelanto      Decimal       @db.Decimal(8, 2)
+  saldo         Decimal       @db.Decimal(8, 2)
+  origen        OrigenReserva @default(WEB)
+  estado        EstadoReserva @default(PENDIENTE_PAGO)
+  expiraEn      DateTime?     @map("expira_en") // creación + 15 minutos (RN04)
+  creadoEn      DateTime      @default(now()) @map("creado_en")
+  cancha        Cancha        @relation(fields: [canchaId], references: [id])
+  jugador       Usuario?      @relation(fields: [jugadorId], references: [id])
+  pagos         Pago[]
+
+  @@index([canchaId, inicio])
+  @@map("reserva")
+}
+
+model Pago {
+  id         Int        @id @default(autoincrement())
+  reservaId  Int        @map("reserva_id")
+  monto      Decimal    @db.Decimal(8, 2)
+  metodo     MetodoPago
+  idPasarela String     @unique @map("id_pasarela") // id que entrega Mercado Pago
+  estado     EstadoPago
+  pagadoEn   DateTime   @default(now()) @map("pagado_en")
+  reserva    Reserva    @relation(fields: [reservaId], references: [id])
+
+  @@map("pago")
+}

@@ -1,0 +1,23 @@
+digraph A {
+  graph [rankdir=TB, fontname="Carlito", nodesep=0.35, ranksep=0.45, pad=0.2, compound=true];
+  node [fontname="Carlito", fontsize=12, shape=box, style="rounded", penwidth=1.2];
+  edge [fontname="Carlito", fontsize=10, penwidth=1.1];
+  usuario [label="Jugador / Vendedor /\nAdministrador\n(navegador web o celular)", shape=box, style=solid];
+  subgraph cluster_f { label=<<b>FRONTEND</b>  (Render, sitio estático)>; style=dashed; fontsize=12;
+    react [label="Aplicación React (PWA)\npáginas · componentes\nservicios con Axios"]; }
+  subgraph cluster_b { label=<<b>BACKEND</b>  (Render, servicio web)>; style=dashed; fontsize=12;
+    rutas [label="Rutas\n/api/..."]; mw [label="Middlewares\nJWT · roles · Zod"]; ctrl [label="Controladores"];
+    serv [label="Servicios\n(reglas de negocio)"]; repo [label="Repositorios\n(Prisma)"];
+    rutas -> mw -> ctrl -> serv -> repo; }
+  subgraph cluster_d { label=<<b>BASE DE DATOS</b>>; style=dashed; fontsize=12;
+    db [label="PostgreSQL\n(Supabase)", shape=cylinder, style=solid]; }
+  osm [label="OpenStreetMap\n(mapa)", style=dashed]; mp [label="Mercado Pago\n(modo de prueba)", style=dashed];
+  google [label="Google\n(inicio de sesión)", style=dashed];
+  usuario -> react [label="HTTPS"];
+  react -> rutas [label="peticiones REST\nJSON + token JWT"];
+  repo -> db [label="consultas SQL"];
+  react -> osm [style=dashed, label="mosaicos del mapa"];
+  react -> google [style=dashed];
+  serv -> mp [style=dashed, label="crear pago"];
+  mp -> rutas [style=dashed, label="webhook: pago aprobado", constraint=false];
+}

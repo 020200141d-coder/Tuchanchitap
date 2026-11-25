@@ -1,0 +1,95 @@
+digraph ER {
+  graph [rankdir=LR, splines=polyline, nodesep=0.5, ranksep=0.9, fontname="Carlito", bgcolor="white", pad=0.2];
+  node  [shape=plain, fontname="Carlito", fontsize=11];
+  edge  [color="black", dir=both, penwidth=1.1, fontname="Carlito", fontsize=10];
+  // Cada entidad: nombre arriba y atributos con PK/FK a la izquierda
+  usuario [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>USUARIO</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td></td><td align="left">nombre</td></tr>
+   <tr><td></td><td align="left">correo (único)</td></tr>
+   <tr><td></td><td align="left">celular</td></tr>
+   <tr><td></td><td align="left">password_hash</td></tr>
+   <tr><td></td><td align="left">google_id</td></tr>
+   <tr><td></td><td align="left">rol</td></tr>
+   <tr><td></td><td align="left">inasistencias</td></tr>
+   <tr><td></td><td align="left">creado_en</td></tr></table>>];
+  local [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>LOCAL</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">vendedor_id</td></tr>
+   <tr><td></td><td align="left">nombre</td></tr>
+   <tr><td></td><td align="left">direccion, distrito</td></tr>
+   <tr><td></td><td align="left">latitud, longitud</td></tr>
+   <tr><td></td><td align="left">precision_gps</td></tr>
+   <tr><td></td><td align="left">modo_cobro</td></tr>
+   <tr><td></td><td align="left">estado</td></tr></table>>];
+  foto [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>FOTO_LOCAL</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">local_id</td></tr>
+   <tr><td></td><td align="left">url</td></tr>
+   <tr><td></td><td align="left">tipo</td></tr></table>>];
+  horario [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>HORARIO_ATENCION</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">local_id</td></tr>
+   <tr><td></td><td align="left">dia_semana</td></tr>
+   <tr><td></td><td align="left">hora_apertura</td></tr>
+   <tr><td></td><td align="left">hora_cierre</td></tr></table>>];
+  cancha [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>CANCHA</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">local_id</td></tr>
+   <tr><td></td><td align="left">nombre</td></tr>
+   <tr><td></td><td align="left">tipo</td></tr>
+   <tr><td></td><td align="left">superficie</td></tr>
+   <tr><td></td><td align="left">activa</td></tr></table>>];
+  tarifa [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>TARIFA</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">cancha_id</td></tr>
+   <tr><td></td><td align="left">tipo_dia</td></tr>
+   <tr><td></td><td align="left">hora_inicio</td></tr>
+   <tr><td></td><td align="left">hora_fin</td></tr>
+   <tr><td></td><td align="left">precio</td></tr></table>>];
+  bloqueo [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>BLOQUEO</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">cancha_id</td></tr>
+   <tr><td></td><td align="left">inicio</td></tr>
+   <tr><td></td><td align="left">fin</td></tr>
+   <tr><td></td><td align="left">motivo</td></tr></table>>];
+  reserva [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>RESERVA</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">cancha_id</td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">jugador_id (opcional)</td></tr>
+   <tr><td></td><td align="left">codigo (único)</td></tr>
+   <tr><td></td><td align="left">inicio, fin</td></tr>
+   <tr><td></td><td align="left">total, adelanto, saldo</td></tr>
+   <tr><td></td><td align="left">origen</td></tr>
+   <tr><td></td><td align="left">nombre_cliente</td></tr>
+   <tr><td></td><td align="left">estado</td></tr>
+   <tr><td></td><td align="left">expira_en</td></tr></table>>];
+  pago [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="3">
+   <tr><td colspan="2" bgcolor="black"><font color="white"><b>PAGO</b></font></td></tr>
+   <tr><td align="left"><b>PK</b></td><td align="left"><u>id</u></td></tr>
+   <tr><td align="left"><b>FK</b></td><td align="left">reserva_id</td></tr>
+   <tr><td></td><td align="left">monto</td></tr>
+   <tr><td></td><td align="left">metodo</td></tr>
+   <tr><td></td><td align="left">id_pasarela (único)</td></tr>
+   <tr><td></td><td align="left">estado</td></tr>
+   <tr><td></td><td align="left">pagado_en</td></tr></table>>];
+
+  // Pata de gallo: "tee" = uno, "crowodot" = cero o muchos, "crowtee" = uno o muchos
+  usuario -> local   [arrowtail=teetee, arrowhead=crowodot, label="administra"];
+  usuario -> reserva [arrowtail=teeodot, arrowhead=crowodot, label="hace"];
+  local -> cancha    [arrowtail=teetee, arrowhead=crowtee, label="tiene"];
+  local -> foto      [arrowtail=teetee, arrowhead=crowtee];
+  local -> horario   [arrowtail=teetee, arrowhead=crowtee];
+  cancha -> tarifa   [arrowtail=teetee, arrowhead=crowtee];
+  cancha -> bloqueo  [arrowtail=teetee, arrowhead=crowodot];
+  cancha -> reserva  [arrowtail=teetee, arrowhead=crowodot, label="recibe"];
+  reserva -> pago    [arrowtail=teetee, arrowhead=crowodot, label="registra"];
+}
