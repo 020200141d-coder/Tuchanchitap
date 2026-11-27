@@ -25,6 +25,7 @@ _Última revisión: 27 de noviembre de 2026._
 |---|:---:|---|
 | Propuesta del proyecto | ✅ | `docs/Propuesta_Proyecto.docx` |
 | Hito 1: requerimientos, modelo, diagramas, repositorio | ✅ | `docs/Hito1_Evidencias.docx` |
+| Hito 2: API REST y base de datos | ✅ | `docs/Hito2_API_Base_de_Datos.docx` |
 | Diseño de pantallas | ✅ | Prototipo inicial (8 pantallas) y diseño final "Noche de estadio" |
 | Base de datos (Prisma + PostgreSQL) | ✅ | Esquema, 3 migraciones y semilla con 5 canchitas de Cusco |
 | Backend (API REST) | ✅ | Express 5 por capas, JWT, roles, Zod y Swagger en `/docs` |
@@ -34,7 +35,7 @@ _Última revisión: 27 de noviembre de 2026._
 | Integración continua | ✅ | GitHub Actions corre las pruebas en cada push |
 | Despliegue en Render + Supabase | 🔨 | `render.yaml` y guía listos; falta crear los servicios y publicar |
 | Datos reales de las canchas | 🔨 | Coordenadas, precios y horarios por confirmar con cada dueño |
-| Nombres de los integrantes 2 y 3 | ⬜ | En el README y en los documentos |
+| Nombres de los integrantes 2, 3 y 4 | ⬜ | En el README y en los documentos |
 
 ---
 
@@ -87,6 +88,13 @@ Estos cambios deben mencionarse en el siguiente informe como cambios justificado
 
 | Módulo | Responsable | Rutas | Servicio | Pruebas |
 |---|---|:---:|:---:|:---:|
+| Usuarios, autenticación y canchas | Edson | ✅ | ✅ | ✅ |
+| Reservas, tarifas y bloqueos | Integrante 2 | ✅ | ✅ | ✅ |
+| Pagos Yape/Plin, reseñas y panel admin | Integrante 3 | ✅ | ✅ | ✅ |
+| Frontend React y pruebas | Integrante 4 | ✅ | — | ✅ |
+| Despliegue (Render + Supabase) | Edson | 🔨 | — | — |
+
+---|---|:---:|:---:|:---:|
 | Usuarios y autenticación | Edson | ✅ | ✅ | ✅ |
 | Canchas, tarifas y bloqueos | Edson | ✅ | ✅ | ✅ |
 | Reservas | Estudiante 2 | ✅ | ✅ | ✅ |
@@ -127,3 +135,4 @@ Estos valores se cambian en el `.env` sin tocar código, pero conviene decidirlo
 | 2026-11-25 | Hito 1: requerimientos, modelo de datos, diagramas y repositorio inicial | Edson |
 | 2026-11-27 | Backend completo (etapas 1 a 6), pruebas, frontend, diseño "Noche de estadio" y preparación del despliegue | Edson |
 | 2026-11-27 | Este archivo actualizado con el estado real del código | Edson |
+| 2026-11-27 | Informe del Hito 2 (API REST y base de datos) en APA 7 | Edson |
