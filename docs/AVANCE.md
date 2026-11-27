@@ -95,8 +95,8 @@ Cada módulo vive en `backend/src/modules/<módulo>/` con sus archivos `*.routes
 | `canchas` | Aguirre Bravo, Edson Francisco Lino | ✅ | ✅ | ✅ |
 | `reservas` | Canal Sayago, Pabel Junior | ✅ | ✅ | ✅ |
 | `horarios` (tarifas, bloqueos, horas libres) | Canal Sayago, Pabel Junior | ✅ | ✅ | ✅ |
-| `pagos` (Yape/Plin y reseñas) | Carpio Letona, Rfit Holger | ✅ | ✅ | ✅ |
-| `admin`, `anuncios` e `imagenes` | Carpio Letona, Rfit Holger | ✅ | ✅ | ✅ |
+| `pagos` (Yape/Plin y reseñas) | Carpio Letona, Rafit Holger | ✅ | ✅ | ✅ |
+| `admin`, `anuncios` e `imagenes` | Carpio Letona, Rafit Holger | ✅ | ✅ | ✅ |
 | Frontend React y pruebas | Paredes Claros, Adrian Mauricio | ✅ | — | ✅ |
 | Despliegue (Render + Supabase) | Aguirre Bravo, Edson Francisco Lino | 🔨 | — | — |
 

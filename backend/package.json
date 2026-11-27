@@ -22,7 +22,7 @@
   "engines": {
     "node": ">=22"
   },
-  "author": "Aguirre Bravo, Edson Francisco Lino; Canal Sayago, Pabel Junior; Carpio Letona, Rfit Holger; Paredes Claros, Adrian Mauricio",
+  "author": "Aguirre Bravo, Edson Francisco Lino; Canal Sayago, Pabel Junior; Carpio Letona, Rafit Holger; Paredes Claros, Adrian Mauricio",
   "license": "MIT",
   "type": "module",
   "dependencies": {

@@ -18,7 +18,7 @@ Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. E
 | --- | --- |
 | Aguirre Bravo, Edson Francisco Lino | `auth` · `canchas` · despliegue (Render + Supabase) |
 | Canal Sayago, Pabel Junior | `reservas` · `horarios` (tarifas, bloqueos y horas libres) |
-| Carpio Letona, Rfit Holger | `pagos` (Yape/Plin y reseñas) · `admin` · `anuncios` · `imagenes` |
+| Carpio Letona, Rafit Holger | `pagos` (Yape/Plin y reseñas) · `admin` · `anuncios` · `imagenes` |
 | Paredes Claros, Adrian Mauricio | Frontend React · pruebas (Jest, Supertest y Postman) |
 
 **Documentos del proyecto** (en `docs/`):
