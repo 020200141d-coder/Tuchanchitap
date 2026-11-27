@@ -15,6 +15,8 @@ import { useImagenes } from '../contexto/Imagenes';
 import { inclinar } from '../util/animaciones';
 import { reservarConAlerta } from '../util/reservar';
 import { hoyCusco, soles, TIPOS } from '../util/formato';
+import { ArrowRight, MapPin } from 'lucide-react';
+import Estrellas from './Estrellas';
 
 export default function TarjetaCancha({ cancha }) {
   const { usuario } = useSesion();
@@ -32,7 +34,11 @@ export default function TarjetaCancha({ cancha }) {
             <span className="punto-vivo" aria-hidden="true" /> Libre hoy {horas[0].etiqueta}
           </span>
         )}
-        {cancha.promedioEstrellas && <span className="estrellas-tarjeta">★ {cancha.promedioEstrellas}</span>}
+        {cancha.promedioEstrellas && (
+          <span className="estrellas-tarjeta">
+            <Estrellas valor={cancha.promedioEstrellas} compacta tamano={14} />
+          </span>
+        )}
         <div className="etiquetas">
           <Etiqueta tono="exito">{TIPOS[cancha.tipo]}</Etiqueta>
           <Etiqueta>F{cancha.formato}</Etiqueta>
@@ -43,7 +49,7 @@ export default function TarjetaCancha({ cancha }) {
       <div className="tarjeta-cuerpo">
         <h3>{cancha.nombre}</h3>
         <p className="texto-suave">
-          📍 {cancha.zona || 'Cusco'}
+          <MapPin size={15} aria-hidden="true" className="icono-linea" /> {cancha.zona || 'Cusco'}
           {cancha.distanciaKm !== null && cancha.distanciaKm !== undefined && ` · a ${cancha.distanciaKm.toLocaleString('es-PE')} km`}
         </p>
         {horas.length > 0 ? (
@@ -74,7 +80,7 @@ export default function TarjetaCancha({ cancha }) {
             )}
           </span>
           <Link to={`/canchas/${cancha.id}`} className="boton boton-principal boton-chico">
-            Ver horarios →
+            Ver horarios <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
       </div>

@@ -24,6 +24,7 @@ import Dialogo from '../componentes/Dialogo';
 import Campo, { Casilla } from '../componentes/Campo';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
 import { ESTADOS_RESERVA, fechaCorta, fechaLarga, fechaLocal, hoyCusco, rangoHoras, soles } from '../util/formato';
+import Estrellas from '../componentes/Estrellas';
 
 const PESTANAS = [
   { id: 'resumen', texto: 'Resumen' },
@@ -351,7 +352,7 @@ function Resenas() {
       <ul className="lista-simple">
         {lista.datos?.map(r => (
           <li key={r.id}>
-            <span>{'★'.repeat(r.estrellas)}</span> <strong>{r.cancha}</strong> · {r.jugador} · {fechaLarga(r.creadoEn)}
+            <Estrellas valor={r.estrellas} tamano={14} /> <strong>{r.cancha}</strong> · {r.jugador} · {fechaLarga(r.creadoEn)}
             {r.texto && <div className="texto-suave">{r.texto}</div>}
             <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => borrarResena(r)}>
               Borrar

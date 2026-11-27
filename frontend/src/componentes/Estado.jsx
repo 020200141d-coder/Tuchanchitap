@@ -10,6 +10,7 @@
 
 import { useEffect } from 'react';
 import { aviso } from '../util/alertas';
+import { SearchX, X } from 'lucide-react';
 
 export function Cargando({ texto = 'Cargando…' }) {
   return (
@@ -51,9 +52,10 @@ export function MensajeError({ error, alReintentar }) {
   );
 }
 
-export function Vacio({ titulo, texto, children }) {
+export function Vacio({ titulo, texto, children, icono: Icono = SearchX }) {
   return (
     <div className="vacio">
+      <Icono className="vacio-icono" size={42} strokeWidth={1.6} aria-hidden="true" />
       <p className="vacio-titulo">{titulo}</p>
       {texto && <p className="texto-suave">{texto}</p>}
       {children}
@@ -75,7 +77,7 @@ export function Aviso({ tono = 'exito', children, alCerrar }) {
       <span>{children}</span>
       {alCerrar && (
         <button type="button" className="boton-icono" aria-label="Cerrar aviso" onClick={alCerrar}>
-          ×
+          <X size={18} aria-hidden="true" />
         </button>
       )}
     </div>

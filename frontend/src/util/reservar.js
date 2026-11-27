@@ -42,13 +42,13 @@ export async function reservarConAlerta({ cancha, fecha, hora, horas = 1, precio
   const reserva = await confirmar({
     titulo: '¿Separamos tu hora?',
     html,
-    boton: '¡Sí, separar! ⚽',
+    boton: '¡Sí, separar!',
     cancelar: 'Mejor no',
     accion: () => api.post('/reservas', { canchaId: cancha.id, fecha, horaInicio: hora, horas })
   });
   if (!reserva) return null;
 
-  const texto = `¡Pichanga! Reservé ${cancha.nombre} el ${fechaLarga(reserva.inicio)} de ${dos(hora)}:00 a ${dos(hora + horas)}:00 por tukanchitape. ¿Quién se apunta? ⚽`;
+  const texto = `¡Pichanga! Reservé ${cancha.nombre} el ${fechaLarga(reserva.inicio)} de ${dos(hora)}:00 a ${dos(hora + horas)}:00 por tukanchitape. ¿Quién se apunta?`;
   const eleccion = await celebrar({
     titulo: reserva.presencial ? '¡Reserva registrada!' : '¡Hora separada!',
     html: reserva.presencial

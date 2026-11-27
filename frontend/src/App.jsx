@@ -34,7 +34,7 @@ export default function App() {
       </main>
       <footer className="pie">
         <div className="contenedor">
-          tukanchitape · canchitas de Cusco · Mapas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://carto.com/attributions">CARTO</a> · Fotos de ejemplo: Unsplash
+          tukanchitape · canchitas de Cusco · Mapas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Fotos de ejemplo: Unsplash
         </div>
       </footer>
     </>

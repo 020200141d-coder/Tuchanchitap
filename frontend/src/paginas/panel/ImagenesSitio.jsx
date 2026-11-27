@@ -23,6 +23,7 @@ import { aviso, confirmar } from '../../util/alertas';
 import Dialogo from '../../componentes/Dialogo';
 import Campo from '../../componentes/Campo';
 import { Cargando, Etiqueta, MensajeError, Vacio } from '../../componentes/Estado';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 const LUGARES = {
   PORTADA: { texto: 'Portada (carrusel del inicio)', proporcion: 16 / 9 },
@@ -87,10 +88,10 @@ export default function ImagenesSitio() {
                       </span>
                       <div className="acciones">
                         <button type="button" className="boton boton-chico" disabled={i === 0} aria-label="Subir en el orden" onClick={() => cambiar(img, { orden: Math.max(0, delLugar[i - 1].orden - 1) }, 'Orden actualizado')}>
-                          ↑
+                          <ArrowUp size={15} />
                         </button>
                         <button type="button" className="boton boton-chico" disabled={i === delLugar.length - 1} aria-label="Bajar en el orden" onClick={() => cambiar(img, { orden: delLugar[i + 1].orden + 1 }, 'Orden actualizado')}>
-                          ↓
+                          <ArrowDown size={15} />
                         </button>
                         <button type="button" className="boton boton-chico" onClick={() => cambiar(img, { activa: !img.activa }, img.activa ? 'Imagen pausada' : 'Imagen visible')}>
                           {img.activa ? 'Pausar' : 'Activar'}

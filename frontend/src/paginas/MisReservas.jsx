@@ -20,6 +20,8 @@ import { celebrar, confirmar, fiesta } from '../util/alertas';
 import Campo from '../componentes/Campo';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
 import { ESTADOS_PAGO, ESTADOS_RESERVA, enlaceComoLlegar, enlaceWhatsApp, fechaLarga, minutosRestantes, rangoHoras, soles, textoReservaWhatsApp } from '../util/formato';
+import { Star } from 'lucide-react';
+import Estrellas from '../componentes/Estrellas';
 
 // Anillo de cuenta regresiva (verde con tiempo de sobra, amarillo al final).
 function CuentaRegresiva({ minutos, total = 15 }) {
@@ -159,7 +161,11 @@ export default function MisReservas() {
                     Dejar reseña
                   </button>
                 )}
-                {r.resena && <span className="texto-suave">Tu reseña: {'★'.repeat(r.resena.estrellas)}</span>}
+                {r.resena && (
+                  <span className="texto-suave">
+                    Tu reseña: <Estrellas valor={r.resena.estrellas} tamano={14} />
+                  </span>
+                )}
               </div>
               {r.pagos?.length > 0 && (
                 <details>
@@ -182,7 +188,7 @@ export default function MisReservas() {
         alTerminar={() => {
           setPagar(null);
           lista.recargar();
-          celebrar({ titulo: '¡Comprobante enviado!', html: 'El dueño lo revisará y tu reserva quedará <b>confirmada</b>. Te esperamos en la cancha ⚽' });
+          celebrar({ titulo: '¡Comprobante enviado!', html: 'El dueño lo revisará y tu reserva quedará <b>confirmada</b>. Te esperamos en la cancha.' });
         }}
       />
       <DialogoResena
@@ -282,7 +288,7 @@ function DialogoResena({ reserva, alCerrar, alTerminar }) {
         <div className="estrellas" role="radiogroup" aria-label="Estrellas">
           {[1, 2, 3, 4, 5].map(n => (
             <button key={n} type="button" role="radio" aria-checked={estrellas === n} aria-label={`${n} estrellas`} className={n <= estrellas ? 'estrella-llena' : 'estrella'} onClick={() => setEstrellas(n)}>
-              ★
+              <Star size={34} fill={n <= estrellas ? 'currentColor' : 'none'} strokeWidth={n <= estrellas ? 0 : 1.6} aria-hidden="true" />
             </button>
           ))}
         </div>

@@ -16,6 +16,7 @@ import Dialogo from '../../componentes/Dialogo';
 import { aviso as toast, confirmar, fiesta, pedirTexto, seguro } from '../../util/alertas';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../../componentes/Estado';
 import { ESTADOS_PAGO, ESTADOS_RESERVA, enlaceWhatsApp, fechaLarga, fechaLocal, hoyCusco, rangoHoras, soles } from '../../util/formato';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Suma días a 'YYYY-MM-DD' (al mediodía de Cusco para no cruzar de fecha).
 const sumarDias = (fecha, n) => fechaLocal(new Date(`${fecha}T12:00:00-05:00`).getTime() + n * 86400000);
@@ -49,11 +50,11 @@ export function Calendario({ canchaId }) {
         <h2>Calendario</h2>
         <div className="fila-botones">
           <button type="button" className="boton boton-chico" onClick={() => moverSemana(-1)}>
-            ← Semana
+            <ChevronLeft size={16} aria-hidden="true" /> Semana
           </button>
           <input type="date" value={desde} onChange={e => setDesde(e.target.value)} aria-label="Desde" />
           <button type="button" className="boton boton-chico" onClick={() => moverSemana(1)}>
-            Semana →
+            Semana <ChevronRight size={16} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -115,7 +116,7 @@ export function Pagos() {
     confirmar({
       titulo: '¿Aprobar el pago?',
       html: `Revisa en tu app que llegó <b>${soles(p.monto)}</b> con el n.º <b>${seguro(p.numeroOperacion)}</b>.`,
-      boton: 'Sí, llegó ✔',
+      boton: 'Sí, llegó',
       cancelar: 'Aún no',
       icono: 'question',
       accion: () => api.post(`/pagos/${p.id}/aprobar`)

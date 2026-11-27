@@ -14,6 +14,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '../api/cliente';
+import { X } from 'lucide-react';
 
 const CLAVE_OCULTOS = 'tukanchitape.anunciosOcultos';
 const estanOcultos = () => {
@@ -65,7 +66,7 @@ export default function Anuncio({ zona }) {
       <div className="anuncio-cabecera">
         <span className="anuncio-etiqueta">Anuncio · {anuncio.anunciante}</span>
         <button type="button" className="boton-icono" aria-label="Ocultar anuncios" onClick={ocultar}>
-          ×
+          <X size={18} aria-hidden="true" />
         </button>
       </div>
       <p className="anuncio-titulo">{anuncio.titulo}</p>

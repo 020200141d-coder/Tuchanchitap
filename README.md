@@ -86,7 +86,7 @@ Cada imagen se agrega **subiendo y recortando** (Cropper.js, con la proporción 
 
 | Necesidad | Opción de pago descartada | Opción gratis usada |
 | --- | --- | --- |
-| Mapa | Google Maps API | Leaflet + datos de OpenStreetMap con estilo oscuro gratuito de CARTO |
+| Mapa | Google Maps API | Leaflet + teselas de OpenStreetMap (sin clave) oscurecidas con un filtro CSS |
 | Fotos de fondo | Bancos de imágenes de pago | Fotos libres de Unsplash (con crédito), reemplazables desde el panel |
 | Buscar dirección | Google Places | Nominatim (1 consulta/s, solo al registrar una cancha) |
 | Cómo llegar | Directions API | Enlace `https://www.google.com/maps/dir/?api=1&destination=LAT,LNG` |

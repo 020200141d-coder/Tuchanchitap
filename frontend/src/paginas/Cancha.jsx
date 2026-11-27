@@ -27,6 +27,8 @@ import { MapaUnaCancha } from '../componentes/Mapa';
 import Anuncio from '../componentes/Anuncio';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
 import { DIAS, MOTIVOS, TIPOS, enlaceComoLlegar, enlaceWhatsApp, fechaLarga, hoyCusco, soles } from '../util/formato';
+import { ArrowLeft, MessageCircle, Navigation } from 'lucide-react';
+import Estrellas from '../componentes/Estrellas';
 
 export default function Cancha() {
   const { id } = useParams();
@@ -102,7 +104,7 @@ export default function Cancha() {
     )}
     <div className="contenedor" style={{ position: 'relative' }}>
       <Link to="/" className="volver">
-        ← Todas las canchas
+        <ArrowLeft size={18} aria-hidden="true" /> Todas las canchas
       </Link>
       {!c.publicada && <Aviso tono="aviso">Borrador: solo tú (dueño o admin) ves esta ficha. Publícala desde tu panel.</Aviso>}
 
@@ -118,7 +120,11 @@ export default function Cancha() {
             <Etiqueta>Fulbito {c.formato}</Etiqueta>
             {c.techada && <Etiqueta>Techada</Etiqueta>}
             {c.conLuz && <Etiqueta>Con luz</Etiqueta>}
-            {c.promedioEstrellas && <Etiqueta tono="aviso">★ {c.promedioEstrellas} ({c.totalResenas})</Etiqueta>}
+            {c.promedioEstrellas && (
+              <Etiqueta tono="aviso">
+                <Estrellas valor={c.promedioEstrellas} compacta tamano={13} /> ({c.totalResenas})
+              </Etiqueta>
+            )}
           </div>
           {c.descripcion && <p>{c.descripcion}</p>}
           {c.fotos?.length > 0 && (
@@ -202,7 +208,7 @@ export default function Cancha() {
             {resenas.datos?.length === 0 && <p className="texto-suave">Aún no hay reseñas. Solo quien jugó aquí puede dejar una.</p>}
             {resenas.datos?.map(r => (
               <div key={r.id} className="resena">
-                <span aria-label={`${r.estrellas} de 5 estrellas`}>{'★'.repeat(r.estrellas)}{'☆'.repeat(5 - r.estrellas)}</span> <strong>{r.jugador}</strong>
+                <Estrellas valor={r.estrellas} /> <strong>{r.jugador}</strong>
                 {r.texto && <p>{r.texto}</p>}
               </div>
             ))}
@@ -213,11 +219,11 @@ export default function Cancha() {
           <MapaUnaCancha cancha={c} />
           <div className="fila-botones">
             <a className="boton" href={enlaceComoLlegar(c.lat, c.lng)} target="_blank" rel="noopener noreferrer">
-              🧭 Cómo llegar
+              <Navigation size={17} aria-hidden="true" /> Cómo llegar
             </a>
             {whatsapp && (
               <a className="boton boton-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">
-                WhatsApp
+                <MessageCircle size={17} aria-hidden="true" /> WhatsApp
               </a>
             )}
           </div>

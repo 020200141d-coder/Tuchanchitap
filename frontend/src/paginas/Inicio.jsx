@@ -23,6 +23,7 @@ import { MapaCanchas } from '../componentes/Mapa';
 import TarjetaCancha from '../componentes/TarjetaCancha';
 import Anuncio from '../componentes/Anuncio';
 import { Esqueletos, MensajeError, Vacio } from '../componentes/Estado';
+import { ChevronLeft, ChevronRight, Lightbulb, LocateFixed, SlidersHorizontal, Umbrella, X } from 'lucide-react';
 
 const FILTROS_INICIALES = { q: '', tipo: '', formato: '', techada: false, conLuz: false, precioMax: '' };
 const CADA_CUANTAS_UN_ANUNCIO = 6;
@@ -143,13 +144,13 @@ export default function Inicio() {
       <div className="contenedor">
         <div className="chips" role="toolbar" aria-label="Filtros">
           <button type="button" className={`chip ${yo ? 'activo' : ''}`} onClick={cercaDeMi}>
-            📍 Cerca de mí
+            <LocateFixed size={16} aria-hidden="true" /> Cerca de mí
           </button>
           <button type="button" className={`chip ${filtros.techada ? 'activo' : ''}`} onClick={() => cambiar('techada', !filtros.techada)}>
-            ☔ Techada
+            <Umbrella size={16} aria-hidden="true" /> Techada
           </button>
           <button type="button" className={`chip ${filtros.conLuz ? 'activo' : ''}`} onClick={() => cambiar('conLuz', !filtros.conLuz)}>
-            💡 Con luz
+            <Lightbulb size={16} aria-hidden="true" /> Con luz
           </button>
           {[5, 7, 11].map(n => (
             <button key={n} type="button" className={`chip ${filtros.formato === String(n) ? 'activo' : ''}`} onClick={() => alternarFormato(n)}>
@@ -157,7 +158,7 @@ export default function Inicio() {
             </button>
           ))}
           <button type="button" className={`chip ${masFiltros ? 'activo' : ''}`} onClick={() => setMasFiltros(v => !v)}>
-            ⚙ Más filtros
+            <SlidersHorizontal size={16} aria-hidden="true" /> Más filtros
           </button>
           {hayFiltros && (
             <button
@@ -169,7 +170,7 @@ export default function Inicio() {
                 setYo(null);
               }}
             >
-              ✕ Limpiar
+              <X size={16} aria-hidden="true" /> Limpiar
             </button>
           )}
         </div>
@@ -214,13 +215,13 @@ export default function Inicio() {
             {datos.paginas > 1 && (
               <nav className="paginacion fila-botones" style={{ justifyContent: 'center', marginTop: '1.5rem' }} aria-label="Páginas">
                 <button type="button" className="boton" disabled={pagina <= 1} onClick={() => setPagina(p => p - 1)}>
-                  ← Anterior
+                  <ChevronLeft size={18} aria-hidden="true" /> Anterior
                 </button>
                 <span>
                   Página {datos.pagina} de {datos.paginas}
                 </span>
                 <button type="button" className="boton" disabled={pagina >= datos.paginas} onClick={() => setPagina(p => p + 1)}>
-                  Siguiente →
+                  Siguiente <ChevronRight size={18} aria-hidden="true" />
                 </button>
               </nav>
             )}

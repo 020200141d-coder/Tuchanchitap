@@ -9,6 +9,7 @@
 // ============================================================================
 
 import { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 
 export default function Dialogo({ abierto, titulo, alCerrar, children, ancho = 560 }) {
   const ref = useRef(null);
@@ -34,7 +35,7 @@ export default function Dialogo({ abierto, titulo, alCerrar, children, ancho = 5
           <div className="dialogo-cabecera">
             <h2 id="titulo-dialogo">{titulo}</h2>
             <button type="button" className="boton-icono" aria-label="Cerrar" onClick={alCerrar}>
-              ×
+              <X size={18} aria-hidden="true" />
             </button>
           </div>
           {children}

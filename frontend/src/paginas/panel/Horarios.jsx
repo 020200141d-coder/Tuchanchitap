@@ -16,6 +16,7 @@ import { confirmar } from '../../util/alertas';
 import Campo from '../../componentes/Campo';
 import { Aviso, Cargando, MensajeError, Vacio } from '../../componentes/Estado';
 import { DIAS, MOTIVOS, fechaLarga, hoyCusco, rangoHoras, soles } from '../../util/formato';
+import { Pencil, X } from 'lucide-react';
 
 export function SelectorCancha({ canchas, valor, alCambiar }) {
   if (!canchas.datos?.length) return null;
@@ -81,10 +82,10 @@ export function Tarifas({ canchaId }) {
                     <span key={t.id} className="franja">
                       {t.horaInicio}:00–{t.horaFin}:00 · {soles(t.precioHora)}
                       <button type="button" className="boton-icono" aria-label="Editar franja" onClick={() => setEditar(t)}>
-                        ✎
+                        <Pencil size={14} aria-hidden="true" />
                       </button>
                       <button type="button" className="boton-icono" aria-label="Borrar franja" onClick={() => borrarFranja(t)}>
-                        ×
+                        <X size={15} aria-hidden="true" />
                       </button>
                     </span>
                   ))}

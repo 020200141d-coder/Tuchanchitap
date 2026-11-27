@@ -14,6 +14,7 @@ import Campo from '../componentes/Campo';
 import { MensajeError } from '../componentes/Estado';
 import { useImagenes } from '../contexto/Imagenes';
 import { aviso } from '../util/alertas';
+import { Shirt, Store } from 'lucide-react';
 
 // Fondo con la foto de 'ingreso' que elige el admin (Imágenes del sitio).
 function PantallaAcceso({ children }) {
@@ -48,7 +49,7 @@ export function Ingresar() {
     f.setError(null);
     try {
       const u = await ingresar(f.datos);
-      aviso(`¡Hola, ${u.nombre.split(' ')[0]}! ⚽`);
+      aviso(`¡Hola, ${u.nombre.split(' ')[0]}!`);
       navegar(desde || destinoPorRol(u.rol), { replace: true });
     } catch (err) {
       f.setError(err);
@@ -112,11 +113,11 @@ export function Registro() {
           <legend className="campo-etiqueta">¿Para qué la usarás?</legend>
           <label className="opcion-rol">
             <input type="radio" name="rol" checked={f.datos.rol === 'JUGADOR'} onChange={() => f.setDatos(d => ({ ...d, rol: 'JUGADOR' }))} />
-            <span aria-hidden="true">⚽</span>Quiero jugar
+            <Shirt size={28} strokeWidth={1.6} aria-hidden="true" />Quiero jugar
           </label>
           <label className="opcion-rol">
             <input type="radio" name="rol" checked={f.datos.rol === 'DUENO'} onChange={() => f.setDatos(d => ({ ...d, rol: 'DUENO' }))} />
-            <span aria-hidden="true">🏟️</span>Tengo una cancha
+            <Store size={28} strokeWidth={1.6} aria-hidden="true" />Tengo una cancha
           </label>
         </fieldset>
         <Campo etiqueta="Nombre y apellido" error={c.nombre}>
