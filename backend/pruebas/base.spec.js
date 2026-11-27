@@ -6,11 +6,12 @@
 //  /docs y que la conversión de horas de Cusco ↔ UTC es correcta.
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const horario = require('../src/lib/horario');
-const { limpiar } = require('../src/lib/respuesta');
-const { manejarErrores } = require('../src/middleware/errores');
+import { jest } from '@jest/globals';
+import request from 'supertest';
+import app from '../src/app.js';
+import horario from '../src/utils/horario.js';
+import { limpiar } from '../src/utils/respuesta.js';
+import { manejarErrores } from '../src/middlewares/error.middleware.js';
 
 describe('Etapa 1 · base de la API', () => {
   test('GET / (ruta principal) responde en JSON', async () => {

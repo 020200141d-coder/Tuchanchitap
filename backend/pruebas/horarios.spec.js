@@ -3,12 +3,12 @@
 //  (incluye la regla 3: el precio sale de la tarifa por franja)
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const { calcularPrecio, calcularAdelanto } = require('../src/servicios/precios');
-const { horasDelDia } = require('../src/servicios/disponibilidad');
-const { aUtc } = require('../src/lib/horario');
-const { reiniciar, crearUsuario, crearCancha, proximoDia, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import { calcularPrecio, calcularAdelanto } from '../src/modules/horarios/precios.service.js';
+import { horasDelDia } from '../src/modules/horarios/disponibilidad.service.js';
+import { aUtc } from '../src/utils/horario.js';
+import { reiniciar, crearUsuario, crearCancha, proximoDia, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

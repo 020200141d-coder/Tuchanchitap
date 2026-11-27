@@ -1,5 +1,5 @@
 // Documentación OpenAPI de /salud (ver src/docs/index.js).
-module.exports = {
+export default {
   '/salud': {
     get: {
       tags: ['Salud'],

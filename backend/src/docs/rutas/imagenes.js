@@ -6,7 +6,7 @@ const idPath = { name: 'id', in: 'path', required: true, schema: { type: 'intege
 const lugar = { type: 'string', enum: ['PORTADA', 'INGRESO', 'CANCHA_SIN_FOTO'] };
 const campos = { lugar, titulo: { type: 'string' }, credito: { type: 'string', example: 'Foto de Paul Lora en Unsplash' }, enlaceCredito: { type: 'string' }, orden: { type: 'integer' }, activa: { type: 'boolean' } };
 
-module.exports = {
+export default {
   '/api/imagenes': {
     get: { tags: ['Imágenes'], summary: 'Imágenes activas del sitio (agrupadas por lugar)', parameters: [{ name: 'lugar', in: 'query', schema: lugar }], responses: { 200: { description: 'Imágenes' } } }
   },

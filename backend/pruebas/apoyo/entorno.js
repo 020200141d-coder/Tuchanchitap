@@ -1,7 +1,7 @@
 // ============================================================================
 //  pruebas/apoyo/entorno.js — se ejecuta antes de cada archivo de prueba
 //
-//  Fija el entorno de prueba ANTES de que se cargue src/config.js: base en
+//  Fija el entorno de prueba ANTES de que se cargue src/config/env.js: base en
 //  memoria, clave JWT fija y reglas con sus valores por defecto, para que los
 //  resultados no dependan de lo que tengas en tu .env.
 // ============================================================================

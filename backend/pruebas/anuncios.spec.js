@@ -3,11 +3,11 @@
 //  tope por pantalla, clics y CRUD del admin
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const anuncios = require('../src/servicios/anuncios');
-const { aUtc, hoyLocal, sumarDias } = require('../src/lib/horario');
-const { reiniciar, crearUsuario, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import anuncios from '../src/modules/anuncios/anuncios.service.js';
+import { aUtc, hoyLocal, sumarDias } from '../src/utils/horario.js';
+import { reiniciar, crearUsuario, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

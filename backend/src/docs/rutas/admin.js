@@ -9,7 +9,7 @@ const q = (name, schema) => ({ name, in: 'query', schema });
 const comunes = { 401: error('Sin sesión'), 403: error('No eres ADMIN') };
 const cuerpoUsuario = { type: 'object', properties: { nombre: { type: 'string' }, email: { type: 'string' }, password: { type: 'string' }, telefono: { type: 'string' }, rol: { type: 'string', enum: ['JUGADOR', 'DUENO', 'ADMIN'] }, activo: { type: 'boolean' } } };
 
-module.exports = {
+export default {
   '/api/admin/resumen': { get: { tags: ['Admin'], summary: 'Números de la plataforma', security: seguro, responses: { 200: { description: 'Resumen', ...exito({ type: 'object' }) }, ...comunes } } },
   '/api/admin/usuarios': {
     get: { tags: ['Admin'], summary: 'Lista paginada de usuarios', security: seguro, parameters: [q('q', { type: 'string' }), q('rol', { type: 'string', enum: ['JUGADOR', 'DUENO', 'ADMIN'] }), q('pagina', { type: 'integer' }), q('porPagina', { type: 'integer' })], responses: { 200: { description: 'Página', ...exito({ type: 'object', properties: { items: { type: 'array', items: ref('Usuario') }, total: { type: 'integer' } } }) }, ...comunes } },

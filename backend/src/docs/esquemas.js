@@ -7,7 +7,7 @@
 
 const ref = nombre => ({ $ref: `#/components/schemas/${nombre}` });
 
-module.exports = {
+export default {
   Error: {
     type: 'object',
     properties: {

@@ -2,13 +2,13 @@
 //  pruebas/auth.spec.js — etapa 2: registro, login, JWT y roles
 // ============================================================================
 
-const express = require('express');
-const request = require('supertest');
-const jwt = require('jsonwebtoken');
-const app = require('../src/app');
-const { autenticar, autenticarOpcional, permitir } = require('../src/middleware/auth');
-const { manejarErrores } = require('../src/middleware/errores');
-const { reiniciar, crearUsuario, db, PASSWORD } = require('./apoyo/ayudas');
+import express from 'express';
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import app from '../src/app.js';
+import { autenticar, autenticarOpcional, permitir } from '../src/middlewares/auth.middleware.js';
+import { manejarErrores } from '../src/middlewares/error.middleware.js';
+import { reiniciar, crearUsuario, db, PASSWORD } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

@@ -18,7 +18,7 @@ const cuerpo = {
   }
 };
 
-module.exports = {
+export default {
   '/api/anuncios': {
     get: {
       tags: ['Anuncios'],

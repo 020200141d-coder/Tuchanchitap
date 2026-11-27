@@ -2,11 +2,11 @@
 //  pruebas/pagos.spec.js — etapa 6: pagos Yape/Plin (reglas 4 y 6) y reseñas (regla 7)
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const pagos = require('../src/servicios/pagos');
-const { aUtc } = require('../src/lib/horario');
-const { reiniciar, crearUsuario, crearCancha, proximoDia, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import pagos from '../src/modules/pagos/pagos.service.js';
+import { aUtc } from '../src/utils/horario.js';
+import { reiniciar, crearUsuario, crearCancha, proximoDia, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

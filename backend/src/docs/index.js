@@ -6,19 +6,20 @@
 //  proyecto agregue su parte sin un archivo gigante. Aquí se juntan.
 // ============================================================================
 
-const esquemas = require('./esquemas');
+import esquemas from './esquemas.js';
+import salud from './rutas/salud.js';
+import auth from './rutas/auth.js';
+import canchas from './rutas/canchas.js';
+import horarios from './rutas/horarios.js';
+import reservas from './rutas/reservas.js';
+import pagos from './rutas/pagos.js';
+import admin from './rutas/admin.js';
+import anuncios from './rutas/anuncios.js';
+import imagenes from './rutas/imagenes.js';
 
-const partes = ['salud', 'auth', 'canchas', 'horarios', 'reservas', 'pagos', 'admin', 'anuncios', 'imagenes']
-  .map(nombre => {
-    try {
-      return require(`./rutas/${nombre}`);
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') return {};
-      throw e;
-    }
-  });
+const partes = [salud, auth, canchas, horarios, reservas, pagos, admin, anuncios, imagenes];
 
-module.exports = {
+export default {
   openapi: '3.0.3',
   info: {
     title: 'Canchitas Cusco · API',

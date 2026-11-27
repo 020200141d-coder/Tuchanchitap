@@ -4,7 +4,7 @@ const ref = n => ({ $ref: `#/components/schemas/${n}` });
 const exito = schema => json({ type: 'object', properties: { ok: { type: 'boolean', example: true }, data: schema } });
 const error = d => ({ description: d, ...json(ref('Error')) });
 
-module.exports = {
+export default {
   '/api/auth/registro': {
     post: {
       tags: ['Auth'],

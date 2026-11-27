@@ -11,14 +11,14 @@
 //      que el intervalo solo mantiene la base ordenada.
 // ============================================================================
 
-const config = require('./config');
-const db = require('./db');
-const app = require('./app');
-const { mantenimiento } = require('./servicios/mantenimiento');
+import config from './config/env.js';
+import db from './config/database.js';
+import app from './app.js';
+import { mantenimiento } from './modules/reservas/mantenimiento.service.js';
+import { cargarSemilla } from '../prisma/datos-semilla.js';
 
 async function arrancar() {
   if (db.motor === 'memoria') {
-    const { cargarSemilla } = require('../prisma/datos-semilla');
     await cargarSemilla(db);
     console.log('[db] Sin DATABASE_URL: modo demo en memoria con datos de ejemplo (se pierden al reiniciar).');
   }

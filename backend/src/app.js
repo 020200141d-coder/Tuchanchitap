@@ -11,16 +11,20 @@
 //   rutas de la API → 404 → manejador central de errores.
 // ============================================================================
 
-const path = require('node:path');
-const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
-const swaggerUi = require('swagger-ui-express');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 
-const config = require('./config');
-const rutas = require('./rutas');
-const especificacion = require('./docs');
-const { manejarErrores, noEncontrada } = require('./middleware/errores');
+import config from './config/env.js';
+import rutas from './routes/index.js';
+import especificacion from './docs/index.js';
+import { manejarErrores, noEncontrada } from './middlewares/error.middleware.js';
+
+// En módulos ES no existe __dirname: se calcula desde la URL del archivo.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
@@ -52,4 +56,4 @@ app.use(rutas);
 app.use(noEncontrada);
 app.use(manejarErrores);
 
-module.exports = app;
+export default app;

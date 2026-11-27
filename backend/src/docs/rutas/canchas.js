@@ -27,7 +27,7 @@ const cuerpoCancha = {
   }
 };
 
-module.exports = {
+export default {
   '/api/canchas': {
     get: {
       tags: ['Canchas'],

@@ -8,9 +8,10 @@
 //  ⚠ Borra los datos existentes: úsalo solo en desarrollo.
 // ============================================================================
 
-require('dotenv').config({ quiet: true });
-const { PrismaClient } = require('@prisma/client');
-const { cargarSemilla } = require('./datos-semilla');
+import dotenv from 'dotenv';
+dotenv.config({ quiet: true });
+import { PrismaClient } from '@prisma/client';
+import { cargarSemilla } from './datos-semilla.js';
 
 async function main() {
   if (process.env.NODE_ENV === 'production') {

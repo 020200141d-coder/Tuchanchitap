@@ -6,7 +6,7 @@ const error = d => ({ description: d, ...json(ref('Error')) });
 const seguro = [{ bearer: [] }];
 const idPath = { name: 'id', in: 'path', required: true, schema: { type: 'integer' } };
 
-module.exports = {
+export default {
   '/api/reglas': {
     get: { tags: ['Reservas'], summary: 'Reglas configurables (minutos para pagar, horas para cancelar…)', responses: { 200: { description: 'Reglas', ...exito({ type: 'object' }) } } }
   },

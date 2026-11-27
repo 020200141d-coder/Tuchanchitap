@@ -2,9 +2,9 @@
 //  pruebas/canchas.spec.js — etapa 3: CRUD del dueño, listado público y regla 4
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const { reiniciar, crearUsuario, crearCancha, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import { reiniciar, crearUsuario, crearCancha, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

@@ -2,12 +2,12 @@
 //  pruebas/reservas.spec.js — etapa 5: reglas 1, 2, 3, 5 y 8
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const reservas = require('../src/servicios/reservas');
-const { mantenimiento } = require('../src/servicios/mantenimiento');
-const { aUtc, hoyLocal, sumarDias } = require('../src/lib/horario');
-const { reiniciar, crearUsuario, crearCancha, proximoDia, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import reservas from '../src/modules/reservas/reservas.service.js';
+import { mantenimiento } from '../src/modules/reservas/mantenimiento.service.js';
+import { aUtc, hoyLocal, sumarDias } from '../src/utils/horario.js';
+import { reiniciar, crearUsuario, crearCancha, proximoDia, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

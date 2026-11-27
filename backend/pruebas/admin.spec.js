@@ -2,10 +2,10 @@
 //  pruebas/admin.spec.js — panel de administración (CRUD de usuarios, listados)
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const { aUtc } = require('../src/lib/horario');
-const { reiniciar, crearUsuario, crearCancha, proximoDia, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import { aUtc } from '../src/utils/horario.js';
+import { reiniciar, crearUsuario, crearCancha, proximoDia, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 

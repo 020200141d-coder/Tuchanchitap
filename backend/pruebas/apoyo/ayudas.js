@@ -6,9 +6,9 @@
 //  datos tiene cada caso y ninguno depende del anterior.
 // ============================================================================
 
-const db = require('../../src/db');
-const { firmarToken, hashear } = require('../../src/servicios/auth');
-const { sumarDias, hoyLocal } = require('../../src/lib/horario');
+import db from '../../src/config/database.js';
+import { firmarToken, hashear } from '../../src/modules/auth/auth.service.js';
+import { sumarDias, hoyLocal } from '../../src/utils/horario.js';
 
 const PASSWORD = 'clave-de-prueba';
 
@@ -67,4 +67,5 @@ function proximoDia(diaSemana, desde = hoyLocal()) {
   throw new Error('inalcanzable');
 }
 
-module.exports = { db, reiniciar, crearUsuario, crearCancha, proximoDia, PASSWORD };
+export { db, reiniciar, crearUsuario, crearCancha, proximoDia, PASSWORD };
+export default { db, reiniciar, crearUsuario, crearCancha, proximoDia, PASSWORD };

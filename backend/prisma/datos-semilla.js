@@ -16,8 +16,8 @@
 //  personas reales.
 // ============================================================================
 
-const bcrypt = require('bcryptjs');
-const { aUtc, hoyLocal, sumarDias, diaSemana } = require('../src/lib/horario');
+import bcrypt from 'bcryptjs';
+import { aUtc, hoyLocal, sumarDias, diaSemana } from '../src/utils/horario.js';
 
 const PASSWORD_DEMO = process.env.SEMILLA_PASSWORD || 'canchitas123';
 
@@ -143,4 +143,5 @@ async function cargarSemilla(db, { ahora = new Date() } = {}) {
   return { usuarios, canchas };
 }
 
-module.exports = { cargarSemilla, USUARIOS, PASSWORD_DEMO };
+export { cargarSemilla, USUARIOS, PASSWORD_DEMO };
+export default { cargarSemilla, USUARIOS, PASSWORD_DEMO };

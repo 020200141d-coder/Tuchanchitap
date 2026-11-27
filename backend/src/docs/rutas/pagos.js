@@ -6,7 +6,7 @@ const error = d => ({ description: d, ...json(ref('Error')) });
 const seguro = [{ bearer: [] }];
 const idPath = { name: 'id', in: 'path', required: true, schema: { type: 'integer' } };
 
-module.exports = {
+export default {
   '/api/reservas/{id}/pagos': {
     post: {
       tags: ['Pagos'],

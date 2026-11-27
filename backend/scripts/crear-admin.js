@@ -13,9 +13,10 @@
 //  Si el correo ya existe, lo convierte en ADMIN y actualiza su contraseña.
 // ============================================================================
 
-require('dotenv').config({ quiet: true });
-const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
+import dotenv from 'dotenv';
+dotenv.config({ quiet: true });
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
 
 async function main() {
   const [email, nombre = 'Administración'] = process.argv.slice(2);

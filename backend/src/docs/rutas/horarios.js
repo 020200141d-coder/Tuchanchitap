@@ -7,7 +7,7 @@ const seguro = [{ bearer: [] }];
 const idPath = { name: 'id', in: 'path', required: true, schema: { type: 'integer' } };
 const fechaQ = (name, required = false) => ({ name, in: 'query', required, schema: { type: 'string', format: 'date', example: '2026-11-28' } });
 
-module.exports = {
+export default {
   '/api/canchas/{id}/tarifas': {
     get: { tags: ['Horarios'], summary: 'Tarifas de la cancha', parameters: [idPath], responses: { 200: { description: 'Lista', ...exito({ type: 'array', items: ref('Tarifa') }) }, 404: error('No existe') } },
     post: {

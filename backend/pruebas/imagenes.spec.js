@@ -3,9 +3,9 @@
 //  y horas libres de hoy en el listado de canchas
 // ============================================================================
 
-const request = require('supertest');
-const app = require('../src/app');
-const { reiniciar, crearUsuario, crearCancha, db } = require('./apoyo/ayudas');
+import request from 'supertest';
+import app from '../src/app.js';
+import { reiniciar, crearUsuario, crearCancha, db } from './apoyo/ayudas.js';
 
 beforeEach(reiniciar);
 
