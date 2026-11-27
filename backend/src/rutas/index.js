@@ -11,5 +11,6 @@ const salud = require('../controladores/salud');
 const router = Router();
 
 router.get('/salud', salud.revisar);
+router.use('/api/auth', require('./auth'));
 
 module.exports = router;
