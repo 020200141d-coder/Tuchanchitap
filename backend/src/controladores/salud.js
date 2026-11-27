@@ -27,4 +27,8 @@ async function revisar(req, res) {
 const config = require('../config');
 const reglas = (req, res) => ok(res, config.reglas);
 
-module.exports = { revisar, reglas };
+// GET / — ruta principal (guía de la sesión 3): confirma que la API responde
+// en JSON y dice dónde está la documentación.
+const inicio = (req, res) => ok(res, { mensaje: 'API de tukanchitape (Canchitas Cusco) funcionando', documentacion: '/docs', salud: '/salud' });
+
+module.exports = { inicio, revisar, reglas };

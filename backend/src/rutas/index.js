@@ -10,6 +10,7 @@ const salud = require('../controladores/salud');
 
 const router = Router();
 
+router.get('/', salud.inicio); // ruta principal: confirma que la API responde
 router.get('/salud', salud.revisar);
 router.get('/api/reglas', salud.reglas);
 router.use('/api/auth', require('./auth'));

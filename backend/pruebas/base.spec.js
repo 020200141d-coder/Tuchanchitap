@@ -13,6 +13,12 @@ const { limpiar } = require('../src/lib/respuesta');
 const { manejarErrores } = require('../src/middleware/errores');
 
 describe('Etapa 1 · base de la API', () => {
+  test('GET / (ruta principal) responde en JSON', async () => {
+    const res = await request(app).get('/');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ ok: true, data: { documentacion: '/docs' } });
+  });
+
   test('GET /salud responde ok con el motor en memoria', async () => {
     const res = await request(app).get('/salud');
     expect(res.status).toBe(200);
