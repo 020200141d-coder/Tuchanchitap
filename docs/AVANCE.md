@@ -5,7 +5,7 @@ Sirve para ver desde cualquier lugar qué se avanzó, qué falta y qué se puede
 
 - Diseño inicial (prototipo navegable): https://claude.ai/artifact/97fFTfsrfF3E3vEDqQy5vu
 - Diseño elegido para el código ("Noche de estadio"): `docs/diseno/`
-- Repositorio: https://github.com/020200141d-coder/Tuchanchitap
+- Repositorio: https://github.com/020200141d-coder/TukanchitaP
 
 **Cómo actualizarlo:** cuando alguien termine una parte, cambia su estado aquí y lo sube en el mismo commit que el código.
 
@@ -26,16 +26,17 @@ _Última revisión: 27 de noviembre de 2026._
 | Propuesta del proyecto | ✅ | `docs/Propuesta_Proyecto.docx` |
 | Hito 1: requerimientos, modelo, diagramas, repositorio | ✅ | `docs/Hito1_Evidencias.docx` |
 | Hito 2: API REST y base de datos | ✅ | `docs/Hito2_API_Base_de_Datos.docx` |
+| Sesión 3: configuración del backend | ✅ | `docs/Sesion3_Configuracion_Backend.docx` (APA 7, 15 capturas) |
 | Diseño de pantallas | ✅ | Prototipo inicial (8 pantallas) y diseño final "Noche de estadio" |
 | Base de datos (Prisma + PostgreSQL) | ✅ | Esquema, 3 migraciones y semilla con 5 canchitas de Cusco |
-| Backend (API REST) | ✅ | Express 5 por capas, JWT, roles, Zod y Swagger en `/docs` |
+| Backend (API REST) | ✅ | Express 5 con estructura modular (`src/modules/`), módulos ES y nodemon; JWT, roles, Zod y Swagger en `/docs` |
 | Frontend (React) | ✅ | Inicio con mapa, ficha de cancha, reservas, panel del dueño y panel admin |
 | Pagos | ✅ | Yape/Plin con foto del comprobante y aprobación del dueño |
-| Pruebas | ✅ | 94 pruebas de Jest + Supertest aprobadas; colección de Postman |
+| Pruebas | ✅ | 95 pruebas de Jest + Supertest aprobadas; colección de Postman |
 | Integración continua | ✅ | GitHub Actions corre las pruebas en cada push |
 | Despliegue en Render + Supabase | 🔨 | `render.yaml` y guía listos; falta crear los servicios y publicar |
 | Datos reales de las canchas | 🔨 | Coordenadas, precios y horarios por confirmar con cada dueño |
-| Nombres de los integrantes 2, 3 y 4 | ⬜ | En el README y en los documentos |
+| Integrantes en README y documentos | ✅ | Los 4 integrantes con sus módulos |
 
 ---
 
@@ -86,20 +87,18 @@ Estos cambios deben mencionarse en el siguiente informe como cambios justificado
 
 ## Backend por módulo
 
+Cada módulo vive en `backend/src/modules/<módulo>/` con sus archivos `*.routes.js`, `*.controller.js`, `*.service.js` y `*.schema.js`, como pide la guía de la sesión 3.
+
 | Módulo | Responsable | Rutas | Servicio | Pruebas |
 |---|---|:---:|:---:|:---:|
-| Usuarios, autenticación y canchas | Edson | ✅ | ✅ | ✅ |
-| Reservas, tarifas y bloqueos | Integrante 2 | ✅ | ✅ | ✅ |
-| Pagos Yape/Plin, reseñas y panel admin | Integrante 3 | ✅ | ✅ | ✅ |
-| Frontend React y pruebas | Integrante 4 | ✅ | — | ✅ |
-| Despliegue (Render + Supabase) | Edson | 🔨 | — | — |
-
----|---|:---:|:---:|:---:|
-| Usuarios y autenticación | Edson | ✅ | ✅ | ✅ |
-| Canchas, tarifas y bloqueos | Edson | ✅ | ✅ | ✅ |
-| Reservas | Estudiante 2 | ✅ | ✅ | ✅ |
-| Pagos | Estudiante 3 | ✅ | ✅ | ✅ |
-| Administración, anuncios e imágenes | Estudiante 3 | ✅ | ✅ | ✅ |
+| `auth` (usuarios y autenticación) | Aguirre Bravo, Edson Francisco Lino | ✅ | ✅ | ✅ |
+| `canchas` | Aguirre Bravo, Edson Francisco Lino | ✅ | ✅ | ✅ |
+| `reservas` | Canal Sayago, Pabel Junior | ✅ | ✅ | ✅ |
+| `horarios` (tarifas, bloqueos, horas libres) | Canal Sayago, Pabel Junior | ✅ | ✅ | ✅ |
+| `pagos` (Yape/Plin y reseñas) | Carpio Letona, Rfit Holger | ✅ | ✅ | ✅ |
+| `admin`, `anuncios` e `imagenes` | Carpio Letona, Rfit Holger | ✅ | ✅ | ✅ |
+| Frontend React y pruebas | Paredes Claros, Adrian Mauricio | ✅ | — | ✅ |
+| Despliegue (Render + Supabase) | Aguirre Bravo, Edson Francisco Lino | 🔨 | — | — |
 
 ---
 
@@ -136,3 +135,4 @@ Estos valores se cambian en el `.env` sin tocar código, pero conviene decidirlo
 | 2026-11-27 | Backend completo (etapas 1 a 6), pruebas, frontend, diseño "Noche de estadio" y preparación del despliegue | Edson |
 | 2026-11-27 | Este archivo actualizado con el estado real del código | Edson |
 | 2026-11-27 | Informe del Hito 2 (API REST y base de datos) en APA 7 | Edson |
+| 2026-11-27 | Backend reorganizado en módulos como la guía de la sesión 3 (módulos ES y nodemon); informe de la sesión 3 en APA 7 con capturas; repositorio renombrado a TukanchitaP | Edson |

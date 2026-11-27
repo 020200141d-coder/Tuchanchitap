@@ -1,20 +1,38 @@
-# tukanchitape · Canchitas Cusco (repositorio Tuchanchitap)
+# TukanchitaP · Canchitas Cusco
 
 Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. El jugador ve las horas libres en un mapa, separa su hora y paga el adelanto por **Yape o Plin**. El dueño maneja su calendario, sus tarifas y sus bloqueos, y aprueba los comprobantes. La administración gestiona usuarios, canchas, reservas, reseñas y **anuncios discretos de negocios del barrio**.
 
-> Proyecto Integrador · Unidad III · *Plataformas para el desarrollo de aplicaciones* · Ingeniería de Sistemas, Universidad Andina del Cusco.
-> **Costo cero:** nada de lo que usa pide tarjeta.
+| | |
+| --- | --- |
+| **Universidad** | Universidad Andina del Cusco · Facultad de Ingeniería y Arquitectura · Escuela Profesional de Ingeniería de Sistemas |
+| **Curso** | Plataformas para el Desarrollo de Aplicaciones · Unidad III · Proyecto Integrador |
+| **Docente** | Ing. Ramiro Mora Jiménez |
+| **Repositorio** | https://github.com/020200141d-coder/TukanchitaP |
+| **Año** | 2026 · Cusco, Perú |
+
+> **Costo cero:** nada de lo que usa la plataforma pide tarjeta de crédito.
 
 ## Equipo
 
-| Integrante | Módulos |
+| Integrante | Módulos a cargo |
 | --- | --- |
-| Aguirre Bravo, Edson Francisco Lino | Usuarios y autenticación · Canchas · Despliegue |
-| Estudiante 2 _(por completar)_ | Reservas · Tarifas y bloqueos |
-| Estudiante 3 _(por completar)_ | Pagos Yape/Plin · Reseñas · Panel admin |
-| Estudiante 4 _(por completar)_ | Frontend React · Pruebas (Jest, Postman) |
+| Aguirre Bravo, Edson Francisco Lino | `auth` · `canchas` · despliegue (Render + Supabase) |
+| Canal Sayago, Pabel Junior | `reservas` · `horarios` (tarifas, bloqueos y horas libres) |
+| Carpio Letona, Rfit Holger | `pagos` (Yape/Plin y reseñas) · `admin` · `anuncios` · `imagenes` |
+| Paredes Claros, Adrian Mauricio | Frontend React · pruebas (Jest, Supertest y Postman) |
 
-**Documentos del Hito 1** (en `docs/`): propuesta (`Propuesta_Proyecto.docx`), evidencias (`Hito1_Evidencias.docx`), avance (`AVANCE.md`), diagramas de arquitectura y entidad-relación (`docs/diagramas/`) y pantallas del diseño (`docs/pantallas/`). En esta versión, el pago en línea con Mercado Pago del Hito 1 se reemplazó por Yape/Plin manual, para mantener el **costo cero**.
+**Documentos del proyecto** (en `docs/`):
+
+| Entrega | Archivo |
+| --- | --- |
+| Propuesta | `Propuesta_Proyecto.docx` |
+| Hito 1: requerimientos, modelo y arquitectura | `Hito1_Evidencias.docx`, `diagramas/`, `pantallas/` |
+| Hito 2: API REST y base de datos | `Hito2_API_Base_de_Datos.docx` |
+| Sesión 3: configuración del backend (APA 7, con capturas) | `Sesion3_Configuracion_Backend.docx`, `evidencias-sesion3/` |
+| Avance del proyecto | `AVANCE.md` |
+| Colección de Postman | `postman/tukanchitape.postman_collection.json` |
+
+En esta versión, el pago en línea con Mercado Pago del Hito 1 se reemplazó por Yape/Plin manual, para mantener el **costo cero**.
 
 ---
 
@@ -97,17 +115,43 @@ Cada imagen se agrega **subiendo y recortando** (Cropper.js, con la proporción 
 
 ## Arquitectura
 
+El backend sigue la **estructura modular** de la guía de la sesión 3: cada funcionalidad es un módulo con sus rutas, controlador, servicio y esquema de validación. Usa módulos ES (`"type": "module"`, `import`/`export`) y `nodemon` en desarrollo.
+
 ```
-backend/src
-├── rutas/          solo URL + middleware (auth, permisos, validación)
-├── controladores/  traducen HTTP ↔ servicio (delgados)
-├── validadores/    esquemas Zod puros
-├── servicios/      reglas de negocio; lanzan ErrorNegocio(mensaje, status)
-├── db/             Prisma (PostgreSQL) o base en memoria (pruebas / modo demo)
-├── middleware/     auth JWT + roles, validar, subida de imágenes, errores
-├── lib/            errores, respuesta, horario Cusco (UTC-5), geo, almacén
-└── docs/           especificación OpenAPI (Swagger en /docs)
+backend/
+├── src/
+│   ├── config/
+│   │   ├── env.js            variables de entorno (dotenv) y reglas configurables
+│   │   ├── database.js       Prisma (PostgreSQL) o base en memoria (pruebas / modo demo)
+│   │   └── memoria.js        base en memoria que imita a Prisma
+│   ├── middlewares/
+│   │   ├── auth.middleware.js      JWT y permisos por rol
+│   │   ├── error.middleware.js     manejador central de errores
+│   │   ├── validar.middleware.js   validación con Zod
+│   │   └── subida.middleware.js    imágenes (multer)
+│   ├── modules/
+│   │   ├── auth/       auth.routes.js · auth.controller.js · auth.service.js · auth.schema.js
+│   │   ├── canchas/    canchas.routes.js · .controller.js · .service.js · .schema.js
+│   │   ├── horarios/   horarios.routes.js · .controller.js · .schema.js · tarifas/bloqueos/disponibilidad/precios.service.js
+│   │   ├── reservas/   reservas.routes.js · .controller.js · .service.js · .schema.js · mantenimiento.service.js
+│   │   ├── pagos/      pagos.routes.js · .controller.js · pagos.service.js · resenas.service.js · .schema.js
+│   │   ├── admin/      admin.routes.js · .controller.js · .service.js · .schema.js
+│   │   ├── anuncios/   anuncios.routes.js · .controller.js · .service.js · .schema.js
+│   │   ├── imagenes/   imagenes.routes.js · .controller.js · .service.js · .schema.js
+│   │   └── salud/      salud.routes.js · salud.controller.js  (GET /, /salud, /api/reglas)
+│   ├── routes/
+│   │   └── index.js          registra las rutas de todos los módulos
+│   ├── utils/                errores, respuesta, horario de Cusco (UTC-5), geo, almacén, validaciones
+│   ├── docs/                 especificación OpenAPI (Swagger en /docs)
+│   ├── app.js                configura Express
+│   └── server.js             inicia el servidor HTTP
+├── prisma/                   schema.prisma, migraciones y semilla
+├── pruebas/                  Jest + Supertest
+├── .env.example
+└── package.json
 ```
+
+- **Flujo de una petición:** `*.routes.js` (URL + middleware) → `*.controller.js` (HTTP) → `*.schema.js` (Zod) → `*.service.js` (reglas; lanza `ErrorNegocio(mensaje, status)`) → Prisma.
 
 - **Respuestas uniformes:** `{ ok: true, data }` o `{ ok: false, error, campos }`.
 - **Códigos HTTP:** 200, 201, 204, 400 (JSON roto, falta la imagen), 401 (sin sesión), 403 (sin permiso), 404, 409 (choque de horario, duplicado), 422 (validación o regla de tiempo) y 500.
@@ -152,14 +196,14 @@ erDiagram
 
 | # | Regla | Dónde | Prueba |
 | --- | --- | --- | --- |
-| 1 | No se reserva una hora que se cruza con otra reserva activa o con un bloqueo → **409**. Se revisa en una transacción *Serializable*: si dos jugadores reservan a la vez, uno recibe 409. | `servicios/reservas.js` | `pruebas/reservas.spec.js` |
-| 2 | La reserva nace PENDIENTE_PAGO y separa la hora 15 min (`MINUTOS_SEPARACION`). Sin comprobante, **expira** y la hora se libera. | `servicios/mantenimiento.js` | `reservas.spec.js`, `horarios.spec.js` |
-| 3 | El precio sale de las tarifas por franja (día/noche, fin de semana). Si el navegador manda el precio → **422**. | `servicios/precios.js`, `validadores/reservas.js` | `horarios.spec.js`, `reservas.spec.js` |
-| 4 | Solo el dueño de la cancha (o ADMIN) la edita, ve sus reservas y aprueba pagos → **403**. | `servicios/canchas.js` (`asegurarDueno`) | `canchas.spec.js`, `pagos.spec.js` |
-| 5 | Si el jugador cancela con menos de `HORAS_CANCELACION` (6 h), pierde el adelanto. Si cancela el dueño, nunca se pierde. | `servicios/reservas.js` | `reservas.spec.js` |
-| 6 | Un número de operación de Yape/Plin no se acepta dos veces → **409** (además de `@@unique` en la base). | `servicios/pagos.js` | `pagos.spec.js` |
-| 7 | Solo reseña quien jugó esa reserva, y una sola vez por reserva. | `servicios/resenas.js` | `pagos.spec.js` |
-| 8 | No se reserva en el pasado, fuera del horario de la cancha ni a más de 30 días → **422**. | `servicios/reservas.js` | `reservas.spec.js` |
+| 1 | No se reserva una hora que se cruza con otra reserva activa o con un bloqueo → **409**. Se revisa en una transacción *Serializable*: si dos jugadores reservan a la vez, uno recibe 409. | `modules/reservas/reservas.service.js` | `pruebas/reservas.spec.js` |
+| 2 | La reserva nace PENDIENTE_PAGO y separa la hora 15 min (`MINUTOS_SEPARACION`). Sin comprobante, **expira** y la hora se libera. | `modules/reservas/mantenimiento.service.js` | `reservas.spec.js`, `horarios.spec.js` |
+| 3 | El precio sale de las tarifas por franja (día/noche, fin de semana). Si el navegador manda el precio → **422**. | `modules/horarios/precios.service.js`, `modules/reservas/reservas.schema.js` | `horarios.spec.js`, `reservas.spec.js` |
+| 4 | Solo el dueño de la cancha (o ADMIN) la edita, ve sus reservas y aprueba pagos → **403**. | `modules/canchas/canchas.service.js` (`asegurarDueno`) | `canchas.spec.js`, `pagos.spec.js` |
+| 5 | Si el jugador cancela con menos de `HORAS_CANCELACION` (6 h), pierde el adelanto. Si cancela el dueño, nunca se pierde. | `modules/reservas/reservas.service.js` | `reservas.spec.js` |
+| 6 | Un número de operación de Yape/Plin no se acepta dos veces → **409** (además de `@@unique` en la base). | `modules/pagos/pagos.service.js` | `pagos.spec.js` |
+| 7 | Solo reseña quien jugó esa reserva, y una sola vez por reserva. | `modules/pagos/resenas.service.js` | `pagos.spec.js` |
+| 8 | No se reserva en el pasado, fuera del horario de la cancha ni a más de 30 días → **422**. | `modules/reservas/reservas.service.js` | `reservas.spec.js` |
 
 Además: máximo 3 reservas esperando pago por jugador; tarifas que no se cruzan; no se bloquea encima de reservas activas; no se borra una cancha con historial (se despublica); el admin no puede quitarse su propio rol.
 
@@ -170,11 +214,11 @@ Requisitos: **Node.js 22 o superior** y Git. PostgreSQL es opcional: sin él, la
 En PowerShell, un comando a la vez:
 
 ```powershell
-git clone https://github.com/020200141d-coder/Tuchanchitap.git canchitas-cusco
+git clone https://github.com/020200141d-coder/TukanchitaP.git
 ```
 
 ```powershell
-cd canchitas-cusco\backend
+cd TukanchitaP\backend
 ```
 
 ```powershell
@@ -189,10 +233,10 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
-La API queda en http://localhost:3000, y Swagger en http://localhost:3000/docs. En otra terminal:
+`npm run dev` usa **nodemon**: el servidor se reinicia solo al guardar cambios. La API queda en http://localhost:3000 (la ruta principal `GET /` responde en JSON) y Swagger en http://localhost:3000/docs. En otra terminal:
 
 ```powershell
-cd canchitas-cusco\frontend
+cd TukanchitaP\frontend
 ```
 
 ```powershell
@@ -280,15 +324,21 @@ npm test
 npm run cobertura
 ```
 
-Resultado actual: **94 pruebas en 9 archivos**, todas pasan. Cobertura:
+Resultado actual: **95 pruebas en 9 archivos**, todas pasan. Cobertura de servicios y esquemas por módulo:
 
-| Capa | Sentencias | Ramas | Funciones | Líneas |
+| Módulo | Sentencias | Ramas | Funciones | Líneas |
 | --- | --- | --- | --- | --- |
-| `src/servicios` | 98.8 % | 93.0 % | 100 % | 100 % |
-| `src/validadores` | 99.1 % | 70.6 % | 95.5 % | 99.0 % |
-| Total medido | 97.5 % | 89.5 % | 98.8 % | 98.4 % |
+| `admin` | 100 % | 96.8 % | 100 % | 100 % |
+| `anuncios` | 100 % | 91.7 % | 100 % | 100 % |
+| `auth` | 97.6 % | 84.0 % | 100 % | 100 % |
+| `canchas` | 97.5 % | 90.3 % | 100 % | 100 % |
+| `horarios` | 99.2 % | 96.9 % | 100 % | 100 % |
+| `imagenes` | 97.9 % | 83.9 % | 93.3 % | 97.0 % |
+| `pagos` | 98.6 % | 92.3 % | 100 % | 100 % |
+| `reservas` | 98.8 % | 94.4 % | 100 % | 100 % |
+| **Total medido** | **97.1 %** | **89.5 %** | **98.8 %** | **98.1 %** |
 
-`jest.config.js` exige un mínimo de 70 % en servicios, y GitHub Actions corre las pruebas en cada push (`.github/workflows/ci.yml`). El reporte HTML queda en `backend/coverage/lcov-report/index.html`.
+Las pruebas corren en modo módulos ES (`node --experimental-vm-modules`, ya incluido en los scripts). `jest.config.js` exige un mínimo de 70 % en los módulos, y GitHub Actions corre las pruebas en cada push (`.github/workflows/ci.yml`). El reporte HTML queda en `backend/coverage/lcov-report/index.html`.
 
 **Postman:** importa `docs/postman/tukanchitape.postman_collection.json`. Son 44 peticiones con pruebas, que guardan los tokens solas. Corre primero la carpeta *Auth*. Para la subida del comprobante, pon el *Working Directory* de Postman en `docs/postman` (usa `comprobante-ejemplo.png`). Con una API recién iniciada en modo demo, las 44 aserciones pasan. Si la vuelves a correr sin reiniciar, el bloqueo ya existe (409) y el límite de intentos de registro puede responder 429.
 
@@ -343,7 +393,7 @@ npm run crear-admin -- tucorreo@ejemplo.com "Tu Nombre"
 ### 3. Render (API y frontend)
 
 1. En https://render.com entra con tu cuenta de GitHub y elige **New → Blueprint**.
-2. Selecciona el repositorio **Tuchanchitap**: Render lee `render.yaml` y propone dos servicios, `tukanchitape-api` y `tukanchitape-web`.
+2. Selecciona el repositorio **TukanchitaP**: Render lee `render.yaml` y propone dos servicios, `tukanchitape-api` y `tukanchitape-web`.
 3. Llena las variables marcadas `sync: false`:
 
 | Servicio | Variable | Valor |
