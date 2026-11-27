@@ -13,5 +13,6 @@ const router = Router();
 router.get('/salud', salud.revisar);
 router.use('/api/auth', require('./auth'));
 router.use('/api/canchas', require('./canchas'));
+router.use('/api', require('./horarios'));
 
 module.exports = router;
