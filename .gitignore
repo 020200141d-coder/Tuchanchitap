@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Secretos: nunca al repositorio (usa los .env.example)
+.env
+.env.*
+!.env.example
+
+# Fotos subidas en desarrollo (comprobantes, fotos de canchas)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Resultados de build y pruebas
+frontend/dist/
+coverage/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

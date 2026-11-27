@@ -1,0 +1,182 @@
+// ============================================================================
+//  prisma/schema.prisma — modelo de datos de Canchitas Cusco
+//
+//  ¿Por qué Prisma?
+//   Define las tablas en un solo archivo legible, genera las migraciones SQL
+//   (carpeta prisma/migrations) y nos da un cliente con autocompletado. La guía
+//   del Proyecto Integrador pide PostgreSQL + Prisma + migraciones.
+//
+//  Entidades y relaciones (7 entidades, más que las 4 pedidas):
+//    Usuario 1─N Cancha   (un DUENO tiene varias canchas)
+//    Cancha  1─N Tarifa   (precio por día de la semana y franja horaria)
+//    Cancha  1─N Bloqueo  (lluvia, mantenimiento: horas que no se pueden reservar)
+//    Cancha  1─N Reserva  ─N─1 Usuario (el JUGADOR que reserva)
+//    Reserva 1─N Pago     (comprobantes Yape/Plin; puede haber uno rechazado y otro nuevo)
+//    Reserva 1─1 Resena   (una sola reseña por reserva jugada)
+//
+//  Horas: las fechas (inicio, fin, expiraEn) se guardan en UTC. Cusco es UTC-5
+//  todo el año (sin horario de verano); la conversión vive en src/lib/horario.js.
+//  Las tarifas usan horas enteras locales (0–24) porque las canchitas se
+//  alquilan por hora completa.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase recomienda una URL directa (sin el pooler) para migrar.
+  directUrl = env("DIRECT_URL")
+}
+
+enum Rol {
+  JUGADOR
+  DUENO
+  ADMIN
+}
+
+enum TipoCancha {
+  SINTETICO
+  LOSA
+  GRASS
+}
+
+enum EstadoReserva {
+  PENDIENTE_PAGO
+  CONFIRMADA
+  CANCELADA
+  EXPIRADA
+  JUGADA
+}
+
+enum MetodoPago {
+  YAPE
+  PLIN
+}
+
+enum EstadoPago {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+enum MotivoBloqueo {
+  LLUVIA
+  MANTENIMIENTO
+  EVENTO
+  OTRO
+}
+
+model Usuario {
+  id           Int       @id @default(autoincrement())
+  nombre       String
+  email        String    @unique
+  telefono     String?
+  passwordHash String
+  rol          Rol       @default(JUGADOR)
+  activo       Boolean   @default(true)
+  creadoEn     DateTime  @default(now())
+  canchas      Cancha[]
+  reservas     Reserva[]
+}
+
+model Cancha {
+  id          Int        @id @default(autoincrement())
+  duenoId     Int
+  dueno       Usuario    @relation(fields: [duenoId], references: [id], onDelete: Restrict)
+  nombre      String
+  descripcion String?
+  tipo        TipoCancha
+  formato     Int        // 5, 7 u 11 jugadores por lado
+  techada     Boolean    @default(false)
+  conLuz      Boolean    @default(false)
+  lat         Float
+  lng         Float
+  direccion   String
+  zona        String?    // barrio o distrito: Wanchaq, San Sebastián…
+  telefono    String?    // WhatsApp del dueño para el enlace wa.me
+  fotos       String[]   @default([])
+  qrPagoUrl   String?    // imagen del QR de Yape/Plin del dueño
+  publicada   Boolean    @default(false)
+  creadoEn    DateTime   @default(now())
+  tarifas     Tarifa[]
+  bloqueos    Bloqueo[]
+  reservas    Reserva[]
+
+  @@index([publicada])
+}
+
+model Tarifa {
+  id           Int     @id @default(autoincrement())
+  canchaId     Int
+  cancha       Cancha  @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+  diaSemana    Int     // 0 = domingo … 6 = sábado
+  horaInicio   Int     // hora local, 0–23
+  horaFin      Int     // hora local, 1–24 (exclusiva)
+  precioHora   Decimal @db.Decimal(8, 2)
+
+  @@index([canchaId, diaSemana])
+}
+
+model Bloqueo {
+  id        Int           @id @default(autoincrement())
+  canchaId  Int
+  cancha    Cancha        @relation(fields: [canchaId], references: [id], onDelete: Cascade)
+  inicio    DateTime
+  fin       DateTime
+  motivo    MotivoBloqueo @default(OTRO)
+  nota      String?
+  creadoEn  DateTime      @default(now())
+
+  @@index([canchaId, inicio])
+}
+
+model Reserva {
+  id              Int           @id @default(autoincrement())
+  canchaId        Int
+  cancha          Cancha        @relation(fields: [canchaId], references: [id], onDelete: Restrict)
+  jugadorId       Int
+  jugador         Usuario       @relation(fields: [jugadorId], references: [id], onDelete: Restrict)
+  inicio          DateTime
+  fin             DateTime
+  total           Decimal       @db.Decimal(8, 2)
+  adelanto        Decimal       @db.Decimal(8, 2)
+  estado          EstadoReserva @default(PENDIENTE_PAGO)
+  expiraEn        DateTime?     // null cuando ya hay comprobante en revisión o está confirmada
+  adelantoPerdido Boolean       @default(false)
+  canceladaEn     DateTime?
+  creadoEn        DateTime      @default(now())
+  pagos           Pago[]
+  resena          Resena?
+
+  @@index([canchaId, inicio])
+  @@index([jugadorId])
+}
+
+model Pago {
+  id              Int        @id @default(autoincrement())
+  reservaId       Int
+  reserva         Reserva    @relation(fields: [reservaId], references: [id], onDelete: Cascade)
+  metodo          MetodoPago
+  numeroOperacion String
+  fotoUrl         String
+  monto           Decimal    @db.Decimal(8, 2)
+  estado          EstadoPago @default(PENDIENTE)
+  nota            String?    // motivo del rechazo
+  creadoEn        DateTime   @default(now())
+  revisadoEn      DateTime?
+
+  // Regla 6: el mismo n.º de operación no se acepta dos veces.
+  @@unique([metodo, numeroOperacion])
+}
+
+model Resena {
+  id         Int      @id @default(autoincrement())
+  reservaId  Int      @unique // regla 7: una reseña por reserva
+  reserva    Reserva  @relation(fields: [reservaId], references: [id], onDelete: Cascade)
+  estrellas  Int
+  texto      String?
+  creadoEn   DateTime @default(now())
+}
