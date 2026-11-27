@@ -194,6 +194,29 @@ model Anuncio {
   @@index([activo, desde, hasta])
 }
 
+// Dónde se usa cada imagen del sitio (las elige el ADMIN en su panel).
+enum LugarImagen {
+  PORTADA          // fondos del inicio (carrusel)
+  INGRESO          // fondo de ingresar / crear cuenta
+  CANCHA_SIN_FOTO  // se muestra cuando una cancha aún no tiene fotos
+}
+
+// Imágenes administrables del sitio. Al inicio son fotos libres de Unsplash
+// (con su crédito); el ADMIN las reemplaza por fotos propias desde el panel.
+model ImagenSitio {
+  id            Int         @id @default(autoincrement())
+  lugar         LugarImagen
+  url           String
+  titulo        String?
+  credito       String?     // "Foto de Paul Lora en Unsplash"
+  enlaceCredito String?
+  orden         Int         @default(0)
+  activa        Boolean     @default(true)
+  creadoEn      DateTime    @default(now())
+
+  @@index([lugar, activa, orden])
+}
+
 model Resena {
   id         Int      @id @default(autoincrement())
   reservaId  Int      @unique // regla 7: una reseña por reserva

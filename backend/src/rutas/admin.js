@@ -10,6 +10,9 @@ const c = require('../controladores/admin');
 const esquemas = require('../validadores/admin');
 const anuncios = require('../controladores/anuncios');
 const esquemasAnuncios = require('../validadores/anuncios');
+const imagenes = require('../controladores/imagenes');
+const esquemasImagenes = require('../validadores/imagenes');
+const { subirImagen } = require('../middleware/subida');
 const { idParam } = require('../validadores/comunes');
 const { validar } = require('../middleware/validar');
 const { autenticar, permitir } = require('../middleware/auth');
@@ -25,6 +28,12 @@ router.delete('/usuarios/:id', validar({ params: idParam }), c.eliminarUsuario);
 router.get('/reservas', validar({ query: esquemas.filtroReservas }), c.listarReservas);
 router.get('/resenas', c.listarResenas);
 router.delete('/resenas/:id', validar({ params: idParam }), c.eliminarResena);
+
+// Imágenes del sitio (fondos de portada, ingreso, cancha sin foto).
+router.get('/imagenes', imagenes.listar);
+router.post('/imagenes', subirImagen('imagen'), validar({ body: esquemasImagenes.crear }), imagenes.crear);
+router.patch('/imagenes/:id', validar({ params: idParam, body: esquemasImagenes.actualizar }), imagenes.actualizar);
+router.delete('/imagenes/:id', validar({ params: idParam }), imagenes.eliminar);
 
 // Anuncios: CRUD con impresiones, clics y tasa de clics para cobrar al anunciante.
 router.get('/anuncios', anuncios.listar);

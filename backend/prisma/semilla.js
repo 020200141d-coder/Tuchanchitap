@@ -18,6 +18,7 @@ async function main() {
   }
   const db = new PrismaClient();
   try {
+    await db.imagenSitio.deleteMany();
     await db.anuncio.deleteMany();
     await db.resena.deleteMany();
     await db.pago.deleteMany();

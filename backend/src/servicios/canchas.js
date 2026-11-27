@@ -20,6 +20,7 @@ const db = require('../db');
 const { ErrorNegocio, noEncontrado, prohibido, conflicto, invalido } = require('../lib/errores');
 const { guardarImagen } = require('../lib/almacen');
 const { distanciaKm } = require('../lib/geo');
+const { hoyLocal } = require('../lib/horario');
 
 const MAX_FOTOS = 6;
 
@@ -88,8 +89,19 @@ async function listarPublicas(filtros) {
 
   const total = lista.length;
   const inicio = (pagina - 1) * porPagina;
+  const items = lista.slice(inicio, inicio + porPagina);
+
+  // Las próximas horas libres de HOY (máx. 4) en cada tarjeta, para reservar
+  // en dos toques sin entrar a la ficha. Solo para la página actual.
+  const { horasDelDia } = require('./disponibilidad');
+  const hoy = hoyLocal();
+  for (const c of items) {
+    const dia = await horasDelDia(c.id, hoy);
+    c.horasLibresHoy = dia.horas.filter(h => h.estado === 'libre').slice(0, 4).map(h => ({ hora: h.hora, etiqueta: h.etiqueta.slice(0, 5), precio: h.precio }));
+  }
+
   return {
-    items: lista.slice(inicio, inicio + porPagina),
+    items,
     total,
     pagina,
     porPagina,

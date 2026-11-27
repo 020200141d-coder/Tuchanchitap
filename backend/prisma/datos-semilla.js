@@ -123,6 +123,23 @@ async function cargarSemilla(db, { ahora = new Date() } = {}) {
   ];
   for (const a of anuncios) await db.anuncio.create({ data: { ...a, desde, hasta } });
 
+  // Imágenes del sitio: fotos libres de Unsplash (licencia Unsplash, uso
+  // gratuito) con su crédito. Se reemplazan desde Admin → Imágenes del sitio.
+  const u = id => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1600&q=70`;
+  const imagenes = [
+    { lugar: 'PORTADA', id: '1785003897037-d7f67231b232', titulo: 'Pichanga nocturna', autor: 'Paul Lora', foto: '5bG4UI5SaiM' },
+    { lugar: 'PORTADA', id: '1759210720456-c9814f721479', titulo: 'Sintética vista desde el dron', autor: 'Tahamie Farooqui', foto: 'BTmakFfGSAw' },
+    { lugar: 'PORTADA', id: '1785003897039-68237919dc5f', titulo: 'Partido bajo los reflectores', autor: 'Paul Lora', foto: 'mKo36Ca2Arw' },
+    { lugar: 'PORTADA', id: '1647118868186-70d38e10b0dc', titulo: 'Cancha de barrio de noche', autor: 'Jose G. Ortega Castro', foto: '9ifBseP9848' },
+    { lugar: 'INGRESO', id: '1517747614396-d21a78b850e8', titulo: 'Cancha iluminada desde arriba', autor: 'Izuddin Helmi Adnan', foto: 'K5ChxJaheKI' },
+    { lugar: 'CANCHA_SIN_FOTO', id: '1759210720456-c9814f721479', titulo: 'Cancha sintética', autor: 'Tahamie Farooqui', foto: 'BTmakFfGSAw' }
+  ];
+  for (const [orden, im] of imagenes.entries()) {
+    await db.imagenSitio.create({
+      data: { lugar: im.lugar, url: u(im.id), titulo: im.titulo, credito: `Foto de ${im.autor} en Unsplash`, enlaceCredito: `https://unsplash.com/photos/${im.foto}`, orden }
+    });
+  }
+
   return { usuarios, canchas };
 }
 

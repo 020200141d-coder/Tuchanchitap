@@ -18,6 +18,10 @@ router.use('/api', require('./horarios'));
 router.use('/api', require('./reservas'));
 router.use('/api', require('./pagos'));
 router.use('/api/anuncios', require('./anuncios'));
+// Imágenes del sitio (público: solo las activas). El CRUD está en /api/admin/imagenes.
+const imagenes = require('../controladores/imagenes');
+const { validar } = require('../middleware/validar');
+router.get('/api/imagenes', validar({ query: require('../validadores/imagenes').consulta }), imagenes.publicas);
 router.use('/api/admin', require('./admin'));
 
 module.exports = router;
