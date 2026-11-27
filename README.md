@@ -1,4 +1,4 @@
-# tukanchitape · Canchitas Cusco
+# tukanchitape · Canchitas Cusco (repositorio Tuchanchitap)
 
 Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. El jugador ve las horas libres en un mapa, separa su hora y paga el adelanto por **Yape o Plin**. El dueño maneja su calendario, sus tarifas y sus bloqueos, y aprueba los comprobantes. La administración gestiona usuarios, canchas, reservas, reseñas y **anuncios discretos de negocios del barrio**.
 
@@ -7,12 +7,13 @@ Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. E
 
 ## Equipo
 
-| Integrante | Rol |
+| Integrante | Módulos |
 | --- | --- |
-| Edson Aguirre | Backend, frontend y despliegue |
-| _(por completar)_ | |
-| _(por completar)_ | |
-| _(por completar)_ | |
+| Aguirre Bravo, Edson Francisco Lino | Usuarios y autenticación · Canchas · Frontend · Despliegue |
+| Estudiante 2 _(por completar)_ | Reservas |
+| Estudiante 3 _(por completar)_ | Pagos · Reportes y panel admin |
+
+**Documentos del Hito 1** (en `docs/`): propuesta (`Propuesta_Proyecto.docx`), evidencias (`Hito1_Evidencias.docx`), avance (`AVANCE.md`), diagramas de arquitectura y entidad-relación (`docs/diagramas/`) y pantallas del diseño (`docs/pantallas/`). En esta versión, el pago en línea con Mercado Pago del Hito 1 se reemplazó por Yape/Plin manual, para mantener el **costo cero**.
 
 ---
 
@@ -147,7 +148,7 @@ Requisitos: **Node.js 22 o superior** y Git. PostgreSQL es opcional: sin él, la
 En PowerShell, un comando a la vez:
 
 ```powershell
-git clone <url-del-repositorio> canchitas-cusco
+git clone https://github.com/020200141d-coder/Tuchanchitap.git canchitas-cusco
 ```
 
 ```powershell
