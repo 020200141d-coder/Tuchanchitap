@@ -1,0 +1,58 @@
+# ============================================================================
+#  render.yaml — despliegue en Render (plan gratis) como "Blueprint"
+#
+#  Crea dos servicios desde este repositorio:
+#   • tukanchitape-api: el backend (Node). Antes de arrancar aplica las
+#     migraciones de Prisma en Supabase (prisma migrate deploy).
+#   • tukanchitape-web: el frontend estático (Vite). La regla de reescritura
+#     manda toda ruta a index.html para que React Router funcione al recargar.
+#  Los valores con `sync: false` se llenan a mano en el panel de Render: así
+#  ningún secreto queda en el repositorio.
+#  Ojo: el plan gratis "duerme" la API tras 15 min sin uso; la primera
+#  petición después tarda unos segundos.
+# ============================================================================
+
+services:
+  - type: web
+    name: tukanchitape-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npx prisma migrate deploy
+    startCommand: npm start
+    healthCheckPath: /salud
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRETO
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: URL_PUBLICA
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: canchitas
+
+  - type: web
+    name: tukanchitape-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

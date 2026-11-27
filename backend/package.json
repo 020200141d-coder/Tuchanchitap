@@ -12,7 +12,8 @@
     "migrar:produccion": "prisma migrate deploy",
     "semilla": "node prisma/semilla.js",
     "test": "jest",
-    "cobertura": "jest --coverage"
+    "cobertura": "jest --coverage",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node prisma/semilla.js"
@@ -33,12 +34,12 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.5.0",
+    "prisma": "^6.19.3",
     "swagger-ui-express": "^5.0.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "prisma": "^6.19.3",
     "supertest": "^7.3.2"
   }
 }
