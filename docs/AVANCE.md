@@ -3,16 +3,19 @@
 Este archivo une el **diseño** de las pantallas con el **código** del repositorio.
 Sirve para ver desde cualquier lugar qué se avanzó, qué falta y qué se puede mejorar.
 
-- Diseño completo (prototipo navegable): https://claude.ai/artifact/97fFTfsrfF3E3vEDqQy5vu
+- Diseño inicial (prototipo navegable): https://claude.ai/artifact/97fFTfsrfF3E3vEDqQy5vu
+- Diseño elegido para el código ("Noche de estadio"): `docs/diseno/`
 - Repositorio: https://github.com/020200141d-coder/Tuchanchitap
 
-**Cómo actualizarlo:** cuando alguien termine una parte, cambia su estado en las tablas de abajo y lo sube en el mismo commit que el código.
+**Cómo actualizarlo:** cuando alguien termine una parte, cambia su estado aquí y lo sube en el mismo commit que el código.
 
 | Símbolo | Significa |
 |:---:|---|
 | ✅ | Terminado |
 | 🔨 | En progreso |
 | ⬜ | Pendiente |
+
+_Última revisión: 27 de noviembre de 2026._
 
 ---
 
@@ -22,71 +25,97 @@ Sirve para ver desde cualquier lugar qué se avanzó, qué falta y qué se puede
 |---|:---:|---|
 | Propuesta del proyecto | ✅ | `docs/Propuesta_Proyecto.docx` |
 | Hito 1: requerimientos, modelo, diagramas, repositorio | ✅ | `docs/Hito1_Evidencias.docx` |
-| Diseño de las 8 pantallas | ✅ | Ver abajo |
-| Base de datos (Prisma) | 🔨 | Esquema escrito; falta crear la base en Supabase y migrar |
-| Backend (API) | 🔨 | Estructura por capas lista; endpoints pendientes |
-| Frontend (React) | 🔨 | Proyecto creado; pantallas pendientes |
-| Pagos (Mercado Pago en modo de prueba) | ⬜ | |
-| Pruebas | ⬜ | |
-| Despliegue en Render | ⬜ | |
+| Diseño de pantallas | ✅ | Prototipo inicial (8 pantallas) y diseño final "Noche de estadio" |
+| Base de datos (Prisma + PostgreSQL) | ✅ | Esquema, 3 migraciones y semilla con 5 canchitas de Cusco |
+| Backend (API REST) | ✅ | Express 5 por capas, JWT, roles, Zod y Swagger en `/docs` |
+| Frontend (React) | ✅ | Inicio con mapa, ficha de cancha, reservas, panel del dueño y panel admin |
+| Pagos | ✅ | Yape/Plin con foto del comprobante y aprobación del dueño |
+| Pruebas | ✅ | 94 pruebas de Jest + Supertest aprobadas; colección de Postman |
+| Integración continua | ✅ | GitHub Actions corre las pruebas en cada push |
+| Despliegue en Render + Supabase | 🔨 | `render.yaml` y guía listos; falta crear los servicios y publicar |
+| Datos reales de las canchas | 🔨 | Coordenadas, precios y horarios por confirmar con cada dueño |
+| Nombres de los integrantes 2 y 3 | ⬜ | En el README y en los documentos |
 
 ---
 
-## Pantallas: diseño → código
+## Pantallas: diseño inicial → código
 
-Cada pantalla indica en qué archivo se programa, qué endpoints de la API necesita y su estado.
+Cada pantalla del prototipo inicial y dónde quedó en la aplicación.
 
 ### Recorrido del jugador
 
-| Diseño | Qué hace | Código |
+| Diseño | Qué hace | En el código |
 |:---:|---|---|
-| <img src="pantallas/main.png" width="170"> | **Inicio con el mapa.** Locales cercanos con precio y si el vendedor está en línea. RF10 | Pantalla: `frontend/src/pages/Inicio.jsx` ⬜<br>API: `GET /api/locales?lat&lng&distrito` ⬜ |
-| <img src="pantallas/local.png" width="170"> | **Página del local.** Elegir día, cancha y hora; las horas ocupadas salen tachadas. RF11 | Pantalla: `frontend/src/pages/Local.jsx` ⬜<br>API: `GET /api/locales/:id` ⬜<br>`GET /api/reservas/disponibilidad?cancha&fecha` ⬜ |
-| <img src="pantallas/reserva.png" width="170"> | **Datos y pago.** Pago con Yape o tarjeta; la hora se separa 15 min. RF12, RF16 | Pantalla: `frontend/src/pages/Reservar.jsx` ⬜<br>API: `POST /api/reservas` ⬜<br>`POST /api/pagos` ⬜ |
-| <img src="pantallas/confirmada.png" width="170"> | **Reserva confirmada.** Código de reserva y opción de compartir. RF17 | Pantalla: `frontend/src/pages/Confirmada.jsx` ⬜<br>API: `POST /api/pagos/webhook` ⬜ |
+| <img src="pantallas/main.png" width="150"> | **Inicio con el mapa.** Canchas cercanas con precio. | ✅ `paginas/Inicio.jsx`: portada, buscador, filtros, "cerca de mí", tarjetas con horas libres de hoy y mapa. |
+| <img src="pantallas/local.png" width="150"> | **Página del local.** Elegir día y hora libre. | ✅ `paginas/Cancha.jsx`: horas libres por día con precio, tarifas, reseñas, "Cómo llegar" y WhatsApp del dueño. |
+| <img src="pantallas/reserva.png" width="150"> | **Datos y pago.** La hora se separa 15 minutos. | ✅ Separación de 15 min y pago del adelanto por Yape/Plin subiendo el comprobante (`util/reservar.js`, `MisReservas.jsx`). |
+| <img src="pantallas/confirmada.png" width="150"> | **Reserva confirmada.** Código y compartir con el equipo. | ✅ Alerta de confirmación con confeti y botón "Avisar al equipo" por WhatsApp. |
 
-### Recorrido del vendedor
+### Recorrido del vendedor (dueño)
 
-| Diseño | Qué hace | Código |
+| Diseño | Qué hace | En el código |
 |:---:|---|---|
-| <img src="pantallas/ingreso.png" width="170"> | **Ingreso.** "Soy jugador" o "Tengo un local"; correo o Google. RF01, RF02 | Pantalla: `frontend/src/pages/Ingresar.jsx` ⬜<br>API: `POST /api/usuarios/registro` ⬜<br>`POST /api/usuarios/login` ⬜ |
-| <img src="pantallas/panel.png" width="170"> | **Panel del vendedor.** En línea, agenda del día y registrar venta en el local. RF14, RF20 | Pantalla: `frontend/src/pages/Panel.jsx` ⬜<br>API: `GET /api/reportes/agenda?fecha` ⬜<br>`POST /api/reservas/local` ⬜ |
-| <img src="pantallas/registro.png" width="170"> | **Registro del local.** Ubicación por GPS (hasta 50 m) y fotos con la cámara. RF05 | Pantalla: `frontend/src/pages/RegistrarLocal.jsx` ⬜<br>API: `POST /api/locales` ⬜<br>`POST /api/locales/:id/fotos` ⬜ |
-| <img src="pantallas/cobros.png" width="170"> | **Cobros de la semana.** Lo recibido, saldos por cobrar y últimos pagos. RF19, RF21 | Pantalla: `frontend/src/pages/Cobros.jsx` ⬜<br>API: `GET /api/reportes/cobros?desde&hasta` ⬜ |
+| <img src="pantallas/ingreso.png" width="150"> | **Ingreso.** Jugador o dueño; correo o Google. | ✅ `paginas/Acceso.jsx`: ingresar y crear cuenta con correo. ⬜ Ingreso con Google (en la hoja de ruta). |
+| <img src="pantallas/panel.png" width="150"> | **Panel del vendedor.** Agenda del día y ventas en el local. | ✅ `paginas/PanelDueno.jsx`: mis canchas, calendario semanal, pagos, tarifas y bloqueos. ⬜ Indicador "En línea". |
+| <img src="pantallas/registro.png" width="150"> | **Registro del local.** Ubicación por GPS y fotos. | ✅ `componentes/FormCancha.jsx`: ubicación en el mapa con búsqueda de dirección, fotos y QR de Yape/Plin. ⬜ Verificación con GPS a 50 m. |
+| <img src="pantallas/cobros.png" width="150"> | **Cobros de la semana.** Lo recibido y los saldos. | 🔨 Pestaña "Pagos" para aprobar comprobantes. Falta el resumen semanal de ingresos. |
 
-### Pantallas que faltan diseñar
+### Pantallas que se agregaron en el código
 
 | Pantalla | Para qué | Estado |
 |---|---|:---:|
-| Panel del administrador | Aprobar locales y gestionar usuarios (RF04, RF06) | ⬜ |
-| Mis reservas (jugador) | Historial y cancelación (RF15, RF18) | ⬜ |
-| Canchas y tarifas (vendedor) | Crear canchas, horarios, tarifas y bloqueos (RF07–RF09) | ⬜ |
+| Mis reservas (jugador) | Estado, cuenta regresiva para pagar, cancelación y reseña | ✅ |
+| Panel del administrador | Resumen, usuarios, canchas, reservas, pagos, reseñas, anuncios e imágenes del sitio | ✅ |
+
+---
+
+## Cambios respecto del Hito 1 (y por qué)
+
+| Antes (Hito 1) | Ahora (código) | Motivo |
+|---|---|---|
+| Pago con Mercado Pago en modo de prueba | Yape/Plin manual con comprobante | Costo cero y es lo que usan los locales de Cusco |
+| Nombre de trabajo "Cancha Libre" | **tukanchitape** | Nombre elegido por el equipo |
+| Rol "VENDEDOR" | Rol "DUENO" | Más claro para el usuario |
+| Ubicación solo por GPS a 50 m | Pin en el mapa con búsqueda de dirección | Más fácil para el dueño; la verificación queda como mejora |
+| Avisos automáticos | Enlaces de WhatsApp con el texto listo | Sin costo por mensaje |
+
+Estos cambios deben mencionarse en el siguiente informe como cambios justificados.
 
 ---
 
 ## Backend por módulo
 
-| Módulo | Responsable | Rutas | Servicio | Repositorio | Pruebas |
-|---|---|:---:|:---:|:---:|:---:|
-| Usuarios y autenticación | Edson | ⬜ | ⬜ | ⬜ | ⬜ |
-| Locales y canchas | Edson | ⬜ | ⬜ | ⬜ | ⬜ |
-| Reservas | Estudiante 2 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Pagos | Estudiante 3 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Reportes | Estudiante 3 | ⬜ | ⬜ | ⬜ | ⬜ |
-
-Ya hecho en el backend: `app.js`, `server.js`, middlewares (`auth`, `roles`, `validar`, `errores`), `schema.prisma` y el SQL que evita reservas cruzadas.
+| Módulo | Responsable | Rutas | Servicio | Pruebas |
+|---|---|:---:|:---:|:---:|
+| Usuarios y autenticación | Edson | ✅ | ✅ | ✅ |
+| Canchas, tarifas y bloqueos | Edson | ✅ | ✅ | ✅ |
+| Reservas | Estudiante 2 | ✅ | ✅ | ✅ |
+| Pagos | Estudiante 3 | ✅ | ✅ | ✅ |
+| Administración, anuncios e imágenes | Estudiante 3 | ✅ | ✅ | ✅ |
 
 ---
 
-## Puntos en discusión y mejoras
+## Qué podemos mejorar
 
-| Tema | Situación | Decisión |
-|---|---|---|
-| Días para reservar con anticipación | Entre 10 y 14; el diseño muestra 14 | Pendiente |
-| Cobro de la plataforma | Tarifa de servicio al jugador; plan gratis al vendedor | Pendiente de mejorar |
-| Nombre definitivo | Repositorio "Tuchanchitap"; el diseño usa "Cancha Libre" | Pendiente |
-| Avisos por WhatsApp | Tiene costo por mensaje | Fuera de la primera versión |
-| Pantallas del administrador, de "Mis reservas" y de canchas y tarifas | No están en el diseño | Diseñar antes del Hito 3 |
+| Mejora | Prioridad | Comentario |
+|---|:---:|---|
+| Publicar en Render + Supabase | Alta | Sin esto no hay enlace para mostrar fuera de la PC |
+| Confirmar datos de las 5 canchas reales | Alta | Precios, horarios y ubicación con cada dueño |
+| Resumen semanal de ingresos del dueño | Media | Era la pantalla "Cobros" del diseño |
+| Ingreso con Google | Media | Estaba en el Hito 1 |
+| Indicador "En línea" del dueño | Media | Estaba en el diseño inicial |
+| App instalable (PWA) y avisos push | Baja | En la hoja de ruta del README |
+| "Arma tu pichanga" y turnos fijos semanales | Baja | Ideas para atraer más jugadores |
+
+### Puntos en discusión
+
+| Tema | Situación |
+|---|---|
+| Días para reservar con anticipación | El código usa 30 (`DIAS_ANTICIPACION`); el equipo hablaba de 10 a 14 |
+| Porcentaje de adelanto | El código usa 30 % (`PORCENTAJE_ADELANTO`); el Hito 1 decía 40 % |
+| Horas para cancelar sin perder el adelanto | El código usa 6 (`HORAS_CANCELACION`); el Hito 1 decía 24 |
+
+Estos valores se cambian en el `.env` sin tocar código, pero conviene decidirlos y que el informe diga lo mismo.
 
 ---
 
@@ -96,4 +125,5 @@ Ya hecho en el backend: `app.js`, `server.js`, middlewares (`auth`, `roles`, `va
 |---|---|---|
 | 2026-11-20 | Propuesta del proyecto y diseño de 8 pantallas | Edson |
 | 2026-11-25 | Hito 1: requerimientos, modelo de datos, diagramas y repositorio inicial | Edson |
-| 2026-11-27 | Este archivo de avance, que une el diseño con el código | Edson |
+| 2026-11-27 | Backend completo (etapas 1 a 6), pruebas, frontend, diseño "Noche de estadio" y preparación del despliegue | Edson |
+| 2026-11-27 | Este archivo actualizado con el estado real del código | Edson |
