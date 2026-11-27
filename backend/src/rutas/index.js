@@ -11,8 +11,10 @@ const salud = require('../controladores/salud');
 const router = Router();
 
 router.get('/salud', salud.revisar);
+router.get('/api/reglas', salud.reglas);
 router.use('/api/auth', require('./auth'));
 router.use('/api/canchas', require('./canchas'));
 router.use('/api', require('./horarios'));
+router.use('/api', require('./reservas'));
 
 module.exports = router;

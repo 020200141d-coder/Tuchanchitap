@@ -22,4 +22,9 @@ async function revisar(req, res) {
   ok(res, { estado: 'ok', motor: db.motor, baseDatos, hora: new Date().toISOString() }, baseDatos === 'ok' ? 200 : 503);
 }
 
-module.exports = { revisar };
+// GET /api/reglas — valores configurables que el frontend muestra al jugador
+// ("tienes 15 minutos para pagar", "cancela con 6 h de anticipación"…).
+const config = require('../config');
+const reglas = (req, res) => ok(res, config.reglas);
+
+module.exports = { revisar, reglas };
