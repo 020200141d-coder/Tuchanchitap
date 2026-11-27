@@ -90,7 +90,7 @@ export default function Cancha() {
     }
   };
 
-  const whatsapp = enlaceWhatsApp(c.telefono, `Hola, vi ${c.nombre} en tukanchitape y quisiera consultar por una reserva.`);
+  const whatsapp = enlaceWhatsApp(c.telefono, `Hola, vi ${c.nombre} en TukanchitaP y quisiera consultar por una reserva.`);
   const tarifasPorDia = DIAS.map((nombre, d) => ({ nombre, franjas: (c.tarifas || []).filter(t => t.diaSemana === d) }));
 
   const portada = c.fotos?.[0] || canchaSinFoto;

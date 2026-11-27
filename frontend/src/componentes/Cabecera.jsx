@@ -16,9 +16,9 @@ export default function Cabecera() {
   return (
     <header className="cabecera">
       <div className="contenedor cabecera-fila">
-        <NavLink to="/" className="marca" aria-label="tukanchitape, inicio">
+        <NavLink to="/" className="marca" aria-label="TukanchitaP, inicio">
           <img src="/pelota.svg" alt="" width="28" height="28" />
-          <span>tukanchita<b>pe</b></span>
+          <span>Tukanchita<b>P</b></span>
         </NavLink>
         <nav className="navegacion" aria-label="Principal">
           <NavLink to="/" end>

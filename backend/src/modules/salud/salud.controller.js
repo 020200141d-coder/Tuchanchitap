@@ -29,7 +29,7 @@ const reglas = (req, res) => ok(res, config.reglas);
 
 // GET / — ruta principal (guía de la sesión 3): confirma que la API responde
 // en JSON y dice dónde está la documentación.
-const inicio = (req, res) => ok(res, { mensaje: 'API de tukanchitape (Canchitas Cusco) funcionando', documentacion: '/docs', salud: '/salud' });
+const inicio = (req, res) => ok(res, { mensaje: 'API de TukanchitaP (Canchitas Cusco) funcionando', documentacion: '/docs', salud: '/salud' });
 
 export { inicio, revisar, reglas };
 export default { inicio, revisar, reglas };

@@ -48,7 +48,7 @@ export async function reservarConAlerta({ cancha, fecha, hora, horas = 1, precio
   });
   if (!reserva) return null;
 
-  const texto = `¡Pichanga! Reservé ${cancha.nombre} el ${fechaLarga(reserva.inicio)} de ${dos(hora)}:00 a ${dos(hora + horas)}:00 por tukanchitape. ¿Quién se apunta?`;
+  const texto = `¡Pichanga! Reservé ${cancha.nombre} el ${fechaLarga(reserva.inicio)} de ${dos(hora)}:00 a ${dos(hora + horas)}:00 por TukanchitaP. ¿Quién se apunta?`;
   const eleccion = await celebrar({
     titulo: reserva.presencial ? '¡Reserva registrada!' : '¡Hora separada!',
     html: reserva.presencial

@@ -76,7 +76,7 @@ Cada pantalla del prototipo inicial y dónde quedó en la aplicación.
 | Antes (Hito 1) | Ahora (código) | Motivo |
 |---|---|---|
 | Pago con Mercado Pago en modo de prueba | Yape/Plin manual con comprobante | Costo cero y es lo que usan los locales de Cusco |
-| Nombre de trabajo "Cancha Libre" | **tukanchitape** | Nombre elegido por el equipo |
+| Nombre de trabajo "Cancha Libre" | **TukanchitaP** | Nombre elegido por el equipo |
 | Rol "VENDEDOR" | Rol "DUENO" | Más claro para el usuario |
 | Ubicación solo por GPS a 50 m | Pin en el mapa con búsqueda de dirección | Más fácil para el dueño; la verificación queda como mejora |
 | Avisos automáticos | Enlaces de WhatsApp con el texto listo | Sin costo por mensaje |

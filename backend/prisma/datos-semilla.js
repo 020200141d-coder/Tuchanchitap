@@ -117,7 +117,7 @@ async function cargarSemilla(db, { ahora = new Date() } = {}) {
   const desde = aUtc(hoy, 0);
   const hasta = aUtc(sumarDias(hoy, 60), 24);
   const anuncios = [
-    { anunciante: 'Deportes El Crack (ficticio)', titulo: 'Chimpunes con 10 % de descuento', texto: 'Cerca de Parque Industrial. Muestra tu reserva de tukanchitape.', zona: 'Wanchaq', enlace: 'https://wa.me/51984000099' },
+    { anunciante: 'Deportes El Crack (ficticio)', titulo: 'Chimpunes con 10 % de descuento', texto: 'Cerca de Parque Industrial. Muestra tu reserva de TukanchitaP.', zona: 'Wanchaq', enlace: 'https://wa.me/51984000099' },
     { anunciante: 'Juguería La Pichanga (ficticia)', titulo: 'Jugo + agua después del partido', texto: 'Combo a S/ 6 para el equipo que acaba de jugar.', zona: 'San Sebastián', enlace: null },
     { anunciante: 'Fisio Cusco Sport (ficticio)', titulo: '¿Te torciste el tobillo?', texto: 'Evaluación de lesiones deportivas. Primera consulta con descuento.', zona: null, enlace: null }
   ];

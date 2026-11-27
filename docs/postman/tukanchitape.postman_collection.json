@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "tukanchitape · Canchitas Cusco API",
+    "name": "TukanchitaP · Canchitas Cusco API",
     "description": "Colección del Proyecto Integrador. Corre primero la carpeta Auth (guarda los tokens) y luego el resto en orden. Ajusta la variable `fecha` a un día futuro de lunes a viernes. La contraseña de la semilla está en la variable `password` (ver README). Para la subida del comprobante, configura en Postman el Working Directory en docs/postman (o elige la imagen a mano).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

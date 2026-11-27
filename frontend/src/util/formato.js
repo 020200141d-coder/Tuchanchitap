@@ -43,7 +43,7 @@ export const enlaceComoLlegar = (lat, lng) => `https://www.google.com/maps/dir/?
 export const enlaceWhatsApp = (telefono, texto) => (telefono ? `https://wa.me/${telefono}?text=${encodeURIComponent(texto)}` : null);
 
 export function textoReservaWhatsApp(reserva, cancha) {
-  return `Hola, reservé ${cancha.nombre} por tukanchitape el ${fechaLarga(reserva.inicio)} de ${rangoHoras(reserva.inicio, reserva.fin)} (reserva #${reserva.id}). Total ${soles(reserva.total)}, adelanto ${soles(reserva.adelanto)}.`;
+  return `Hola, reservé ${cancha.nombre} por TukanchitaP el ${fechaLarga(reserva.inicio)} de ${rangoHoras(reserva.inicio, reserva.fin)} (reserva #${reserva.id}). Total ${soles(reserva.total)}, adelanto ${soles(reserva.adelanto)}.`;
 }
 
 export const minutosRestantes = expiraEn => (expiraEn ? Math.max(0, Math.ceil((new Date(expiraEn) - Date.now()) / 60000)) : null);

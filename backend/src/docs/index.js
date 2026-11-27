@@ -22,7 +22,7 @@ const partes = [salud, auth, canchas, horarios, reservas, pagos, admin, anuncios
 export default {
   openapi: '3.0.3',
   info: {
-    title: 'Canchitas Cusco · API',
+    title: 'TukanchitaP · API de Canchitas Cusco',
     version: '1.0.0',
     description:
       'API REST para reservar canchitas de fulbito del círculo local de Cusco. ' +
