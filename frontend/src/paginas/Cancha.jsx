@@ -6,8 +6,11 @@
 //      (libre / ocupada / bloqueada / pasada) con su precio.
 //   2. Toca una hora libre (y cuántas horas) → resumen con el precio que
 //      calcula la API. El navegador NUNCA manda el precio (regla 3).
-//   3. "Separar hora" → POST /reservas. Queda esperando pago unos minutos y
-//      lo llevamos a "Mis reservas" para subir el comprobante.
+//   3. "Separar hora" → alerta de confirmación (SweetAlert2) → POST /reservas
+//      → confeti y opciones: pagar ahora o avisar al equipo por WhatsApp.
+//      Queda esperando pago unos minutos en "Mis reservas".
+//  Portada: la primera foto de la cancha o la imagen "cancha sin foto" que
+//  define el admin.
 //  Extras gratis: "Cómo llegar" (enlace de Google Maps, sin API) y WhatsApp
 //  del dueño (wa.me con texto listo). Un anuncio discreto al final de la
 //  ficha; ninguno en el resumen de reserva.
@@ -18,6 +21,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../api/cliente';
 import { useSesion } from '../contexto/Sesion';
 import { useCarga } from '../util/useCarga';
+import { useImagenes } from '../contexto/Imagenes';
+import { reservarConAlerta } from '../util/reservar';
 import { MapaUnaCancha } from '../componentes/Mapa';
 import Anuncio from '../componentes/Anuncio';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
@@ -27,6 +32,7 @@ export default function Cancha() {
   const { id } = useParams();
   const { usuario } = useSesion();
   const navegar = useNavigate();
+  const { canchaSinFoto } = useImagenes();
   const [fecha, setFecha] = useState(hoyCusco());
   const [elegida, setElegida] = useState(null);
   const [horas, setHoras] = useState(1);
@@ -68,16 +74,15 @@ export default function Cancha() {
     setHoras(1);
   };
 
+  // Confirmación con SweetAlert2, reserva y celebración con confeti
+  // (util/reservar.js). Si no se concretó, refrescamos el día por si alguien
+  // tomó la hora mientras tanto.
   const reservar = async () => {
-    if (!usuario) return navegar('/ingresar', { state: { desde: `/canchas/${id}` } });
     setReservando(true);
     setErrorReserva(null);
     try {
-      const reserva = await api.post('/reservas', { canchaId: c.id, fecha, horaInicio: elegida.hora, horas });
-      navegar('/mis-reservas', { state: { nueva: reserva.id } });
-    } catch (e) {
-      setErrorReserva(e);
-      if (e.status === 409) dia.recargar(); // alguien la tomó: refrescamos el día
+      const hecha = await reservarConAlerta({ cancha: c, fecha, hora: elegida.hora, horas, precioEstimado, usuario, navegar });
+      if (!hecha) dia.recargar();
     } finally {
       setReservando(false);
     }
@@ -86,8 +91,16 @@ export default function Cancha() {
   const whatsapp = enlaceWhatsApp(c.telefono, `Hola, vi ${c.nombre} en tukanchitape y quisiera consultar por una reserva.`);
   const tarifasPorDia = DIAS.map((nombre, d) => ({ nombre, franjas: (c.tarifas || []).filter(t => t.diaSemana === d) }));
 
+  const portada = c.fotos?.[0] || canchaSinFoto;
+
   return (
-    <div className="contenedor">
+    <>
+    {portada && (
+      <div className="ficha-portada">
+        <img src={portada} alt={`Cancha ${c.nombre}`} />
+      </div>
+    )}
+    <div className="contenedor" style={{ position: 'relative' }}>
       <Link to="/" className="volver">
         ← Todas las canchas
       </Link>
@@ -234,5 +247,6 @@ export default function Cancha() {
         </aside>
       </div>
     </div>
+    </>
   );
 }

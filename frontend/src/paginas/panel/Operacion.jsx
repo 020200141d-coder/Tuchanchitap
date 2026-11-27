@@ -5,15 +5,15 @@
 //    botón de WhatsApp para escribirle. Desde aquí se cancela una reserva
 //    (el adelanto se devuelve: si cancela el local, el jugador no pierde nada).
 //  • Pagos: bandeja de comprobantes Yape/Plin. El dueño mira la foto, la
-//    compara con su app y aprueba (reserva confirmada) o rechaza con motivo
-//    (el jugador puede reenviar).
+//    compara con su app y aprueba (alerta de confirmación + confeti) o
+//    rechaza escribiendo el motivo en la alerta (el jugador puede reenviar).
 // ============================================================================
 
 import { useState } from 'react';
 import api from '../../api/cliente';
 import { useCarga } from '../../util/useCarga';
-import Dialogo, { Confirmar } from '../../componentes/Dialogo';
-import Campo from '../../componentes/Campo';
+import Dialogo from '../../componentes/Dialogo';
+import { aviso as toast, confirmar, fiesta, pedirTexto, seguro } from '../../util/alertas';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../../componentes/Estado';
 import { ESTADOS_PAGO, ESTADOS_RESERVA, enlaceWhatsApp, fechaLarga, fechaLocal, hoyCusco, rangoHoras, soles } from '../../util/formato';
 
@@ -24,12 +24,24 @@ export function Calendario({ canchaId }) {
   const [desde, setDesde] = useState(hoyCusco());
   const hasta = sumarDias(desde, 6);
   const reservas = useCarga(() => api.get(`/canchas/${canchaId}/reservas`, { params: { desde, hasta } }), [canchaId, desde]);
-  const [cancelar, setCancelar] = useState(null);
   const [aviso, setAviso] = useState(null);
 
   const dias = Array.from({ length: 7 }, (_, i) => sumarDias(desde, i));
   const activas = (reservas.datos || []).filter(r => !['CANCELADA', 'EXPIRADA'].includes(r.estado));
   const moverSemana = n => setDesde(sumarDias(desde, n * 7));
+  const cancelarReserva = r =>
+    confirmar({
+      titulo: '¿Cancelar esta reserva?',
+      html: `Avísale a <b>${seguro(r.jugador.nombre)}</b>. Si ya pagó el adelanto, debes devolvérselo.`,
+      boton: 'Sí, cancelar',
+      cancelar: 'Volver',
+      peligro: true,
+      accion: () => api.post(`/reservas/${r.id}/cancelar`)
+    }).then(res => {
+      if (!res) return;
+      setAviso({ tono: 'exito', texto: res.mensaje });
+      reservas.recargar();
+    });
 
   return (
     <section>
@@ -76,7 +88,7 @@ export function Calendario({ canchaId }) {
                           </a>
                         )}
                         {['PENDIENTE_PAGO', 'CONFIRMADA'].includes(r.estado) && new Date(r.inicio) > new Date() && (
-                          <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => setCancelar(r)}>
+                          <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => cancelarReserva(r)}>
                             Cancelar
                           </button>
                         )}
@@ -89,23 +101,6 @@ export function Calendario({ canchaId }) {
           })}
         </div>
       )}
-      <Confirmar
-        abierto={Boolean(cancelar)}
-        titulo="¿Cancelar esta reserva?"
-        texto={cancelar && `Avísale a ${cancelar.jugador.nombre}. Si ya pagó el adelanto, debes devolvérselo.`}
-        textoBoton="Cancelar reserva"
-        alCerrar={() => setCancelar(null)}
-        alConfirmar={async () => {
-          try {
-            const r = await api.post(`/reservas/${cancelar.id}/cancelar`);
-            setAviso({ tono: 'exito', texto: r.mensaje });
-            reservas.recargar();
-          } catch (e) {
-            setAviso({ tono: 'peligro', texto: e.mensaje });
-          }
-          setCancelar(null);
-        }}
-      />
     </section>
   );
 }
@@ -113,21 +108,36 @@ export function Calendario({ canchaId }) {
 export function Pagos() {
   const [estado, setEstado] = useState('PENDIENTE');
   const pagos = useCarga(() => api.get('/pagos', { params: { estado: estado || undefined } }), [estado]);
-  const [rechazar, setRechazar] = useState(null);
-  const [nota, setNota] = useState('');
-  const [error, setError] = useState(null);
   const [aviso, setAviso] = useState(null);
   const [foto, setFoto] = useState(null);
 
-  const aprobar = async p => {
-    try {
-      await api.post(`/pagos/${p.id}/aprobar`);
-      setAviso({ tono: 'exito', texto: `Pago aprobado: la reserva de ${p.reserva.jugador.nombre} quedó confirmada.` });
+  const aprobar = p =>
+    confirmar({
+      titulo: '¿Aprobar el pago?',
+      html: `Revisa en tu app que llegó <b>${soles(p.monto)}</b> con el n.º <b>${seguro(p.numeroOperacion)}</b>.`,
+      boton: 'Sí, llegó ✔',
+      cancelar: 'Aún no',
+      icono: 'question',
+      accion: () => api.post(`/pagos/${p.id}/aprobar`)
+    }).then(ok => {
+      if (!ok) return;
+      fiesta();
+      toast(`Reserva de ${p.reserva.jugador.nombre} confirmada`);
       pagos.recargar();
-    } catch (e) {
-      setAviso({ tono: 'peligro', texto: e.mensaje });
-    }
-  };
+    });
+
+  const rechazar = p =>
+    pedirTexto({
+      titulo: 'Rechazar comprobante',
+      html: 'El jugador verá el motivo y tendrá unos minutos para reenviarlo.',
+      placeholder: 'El monto no coincide con el adelanto',
+      boton: 'Rechazar',
+      accion: nota => api.post(`/pagos/${p.id}/rechazar`, { nota })
+    }).then(ok => {
+      if (!ok) return;
+      toast('Comprobante rechazado', 'info');
+      pagos.recargar();
+    });
 
   return (
     <section>
@@ -168,7 +178,7 @@ export function Pagos() {
                   <button type="button" className="boton boton-principal" onClick={() => aprobar(p)}>
                     Aprobar
                   </button>
-                  <button type="button" className="boton boton-peligro-suave" onClick={() => { setNota(''); setError(null); setRechazar(p); }}>
+                  <button type="button" className="boton boton-peligro-suave" onClick={() => rechazar(p)}>
                     Rechazar
                   </button>
                 </div>
@@ -179,28 +189,6 @@ export function Pagos() {
       </div>
       <Dialogo abierto={Boolean(foto)} titulo="Comprobante" alCerrar={() => setFoto(null)} ancho={520}>
         {foto && <img src={foto} alt="Comprobante en grande" className="foto-grande" />}
-      </Dialogo>
-      <Dialogo abierto={Boolean(rechazar)} titulo="Rechazar comprobante" alCerrar={() => setRechazar(null)} ancho={440}>
-        <form
-          className="formulario"
-          onSubmit={async e => {
-            e.preventDefault();
-            try {
-              await api.post(`/pagos/${rechazar.id}/rechazar`, { nota });
-              setRechazar(null);
-              setAviso({ tono: 'exito', texto: 'Comprobante rechazado. El jugador tiene unos minutos para reenviarlo.' });
-              pagos.recargar();
-            } catch (err) {
-              setError(err);
-            }
-          }}
-        >
-          <Campo etiqueta="¿Por qué lo rechazas?" error={error?.campos?.nota}>
-            <input value={nota} onChange={e => setNota(e.target.value)} placeholder="El monto no coincide con el adelanto" />
-          </Campo>
-          {error && !error.campos?.nota && <MensajeError error={error} />}
-          <button className="boton boton-peligro boton-bloque">Rechazar</button>
-        </form>
       </Dialogo>
     </section>
   );

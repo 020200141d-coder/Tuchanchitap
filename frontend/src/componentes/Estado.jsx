@@ -1,16 +1,38 @@
 // ============================================================================
 //  src/componentes/Estado.jsx — piezas para los estados de cada pantalla
 //
-//  Cargando (loading), MensajeError (error, con botón para reintentar) y
-//  Vacio (empty, una invitación con acción). El "success" es la pantalla
-//  misma; los avisos breves usan <Aviso>.
+//  Cargando (girador), Esqueletos (tarjetas con brillo mientras llegan los
+//  datos), MensajeError (con reintentar), Vacio (invitación con acción) y
+//  Aviso. Los avisos de ÉXITO se muestran como toast de SweetAlert2 (se
+//  cierran solos); los de error o advertencia quedan fijos en la pantalla
+//  para que la persona los lea con calma.
 // ============================================================================
+
+import { useEffect } from 'react';
+import { aviso } from '../util/alertas';
 
 export function Cargando({ texto = 'Cargando…' }) {
   return (
     <div className="estado" role="status" aria-live="polite">
       <span className="girador" aria-hidden="true" />
       {texto}
+    </div>
+  );
+}
+
+export function Esqueletos({ cantidad = 3 }) {
+  return (
+    <div className="rejilla" aria-busy="true" aria-label="Cargando canchas">
+      {Array.from({ length: cantidad }, (_, i) => (
+        <div key={i} className="esqueleto">
+          <div className="brillo" style={{ height: 170, borderRadius: 0 }} />
+          <div style={{ padding: 16 }}>
+            <div className="brillo" style={{ height: 22, width: '70%' }} />
+            <div className="brillo" style={{ height: 14, width: '45%', marginTop: 10 }} />
+            <div className="brillo" style={{ height: 32, width: '90%', marginTop: 16 }} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -40,7 +62,14 @@ export function Vacio({ titulo, texto, children }) {
 }
 
 export function Aviso({ tono = 'exito', children, alCerrar }) {
-  if (!children) return null;
+  const esToast = tono === 'exito' && typeof children === 'string';
+  useEffect(() => {
+    if (!esToast || !children) return;
+    aviso(children, 'success');
+    alCerrar?.();
+  }, [esToast, children]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!children || esToast) return null;
   return (
     <div className={`aviso aviso-${tono}`} role={tono === 'peligro' ? 'alert' : 'status'}>
       <span>{children}</span>

@@ -3,14 +3,16 @@
 //
 //  Lo usan el panel del dueño (sus canchas) y el del admin (todas, y puede
 //  elegir el dueño). Cada fila permite: editar (diálogo con FormCancha),
-//  publicar/despublicar, subir fotos y el QR de Yape/Plin, y borrar (la API
-//  responde 409 si tiene reservas: entonces se sugiere despublicar).
+//  publicar/despublicar, subir fotos y el QR de Yape/Plin, y borrar con
+//  confirmación SweetAlert2 (la API responde 409 si tiene reservas: entonces
+//  se sugiere despublicar).
 // ============================================================================
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/cliente';
-import Dialogo, { Confirmar } from '../../componentes/Dialogo';
+import Dialogo from '../../componentes/Dialogo';
+import { aviso as toast, confirmar, seguro } from '../../util/alertas';
 import FormCancha from '../../componentes/FormCancha';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../../componentes/Estado';
 import { TIPOS, soles } from '../../util/formato';
@@ -18,12 +20,24 @@ import { TIPOS, soles } from '../../util/formato';
 export default function GestionCanchas({ canchas, esAdmin, duenos }) {
   const [editar, setEditar] = useState(null); // null | 'nueva' | cancha
   const [imagenes, setImagenes] = useState(null);
-  const [borrar, setBorrar] = useState(null);
   const [aviso, setAviso] = useState(null);
-  const [errorBorrar, setErrorBorrar] = useState(null);
-  const [ocupado, setOcupado] = useState(false);
 
   const recargar = () => canchas.recargar();
+
+  // Borrar con SweetAlert2; si tiene reservas la API responde 409 y el mensaje
+  // ("despublícala") aparece dentro de la misma ventana.
+  const borrarCancha = c =>
+    confirmar({
+      titulo: '¿Borrar la cancha?',
+      html: `Se borrarán <b>${seguro(c.nombre)}</b>, sus tarifas y bloqueos. No se puede deshacer.`,
+      boton: 'Sí, borrar',
+      peligro: true,
+      accion: () => api.delete(`/canchas/${c.id}`)
+    }).then(ok => {
+      if (!ok) return;
+      toast('Cancha borrada');
+      recargar();
+    });
 
   const alternarPublicada = async c => {
     try {
@@ -98,7 +112,7 @@ export default function GestionCanchas({ canchas, esAdmin, duenos }) {
                     <button type="button" className="boton boton-chico" onClick={() => alternarPublicada(c)}>
                       {c.publicada ? 'Despublicar' : 'Publicar'}
                     </button>
-                    <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => { setErrorBorrar(null); setBorrar(c); }}>
+                    <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => borrarCancha(c)}>
                       Borrar
                     </button>
                   </td>
@@ -126,32 +140,6 @@ export default function GestionCanchas({ canchas, esAdmin, duenos }) {
 
       <DialogoImagenes cancha={imagenes && canchas.datos?.find(c => c.id === imagenes.id)} alCerrar={() => setImagenes(null)} alCambiar={recargar} />
 
-      <Confirmar
-        abierto={Boolean(borrar)}
-        titulo="¿Borrar la cancha?"
-        texto={
-          <>
-            Se borrarán {borrar?.nombre}, sus tarifas y bloqueos. No se puede deshacer.
-            {errorBorrar && <MensajeError error={errorBorrar} />}
-          </>
-        }
-        textoBoton="Borrar"
-        ocupado={ocupado}
-        alCerrar={() => setBorrar(null)}
-        alConfirmar={async () => {
-          setOcupado(true);
-          try {
-            await api.delete(`/canchas/${borrar.id}`);
-            setBorrar(null);
-            setAviso({ tono: 'exito', texto: 'Cancha borrada.' });
-            recargar();
-          } catch (e) {
-            setErrorBorrar(e);
-          } finally {
-            setOcupado(false);
-          }
-        }}
-      />
     </section>
   );
 }

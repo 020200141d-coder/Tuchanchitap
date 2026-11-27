@@ -11,7 +11,8 @@
 import { useState } from 'react';
 import api from '../../api/cliente';
 import { useCarga } from '../../util/useCarga';
-import Dialogo, { Confirmar } from '../../componentes/Dialogo';
+import Dialogo from '../../componentes/Dialogo';
+import { confirmar } from '../../util/alertas';
 import Campo from '../../componentes/Campo';
 import { Aviso, Cargando, MensajeError, Vacio } from '../../componentes/Estado';
 import { DIAS, MOTIVOS, fechaLarga, hoyCusco, rangoHoras, soles } from '../../util/formato';
@@ -35,7 +36,6 @@ export function Tarifas({ canchaId }) {
   const tarifas = useCarga(() => api.get(`/canchas/${canchaId}/tarifas`), [canchaId]);
   const [nueva, setNueva] = useState(false);
   const [editar, setEditar] = useState(null);
-  const [borrar, setBorrar] = useState(null);
   const [aviso, setAviso] = useState(null);
 
   const porDia = DIAS.map((nombre, d) => ({ d, nombre, franjas: (tarifas.datos || []).filter(t => t.diaSemana === d) }));
@@ -43,6 +43,14 @@ export function Tarifas({ canchaId }) {
     setAviso({ tono: 'exito', texto });
     tarifas.recargar();
   };
+  const borrarFranja = t =>
+    confirmar({
+      titulo: '¿Borrar esta franja?',
+      html: `<b>${DIAS[t.diaSemana]} ${t.horaInicio}:00–${t.horaFin}:00</b> quedará cerrado.`,
+      boton: 'Sí, borrar',
+      peligro: true,
+      accion: () => api.delete(`/tarifas/${t.id}`)
+    }).then(ok => ok && listo('Franja borrada.'));
 
   return (
     <section>
@@ -75,7 +83,7 @@ export function Tarifas({ canchaId }) {
                       <button type="button" className="boton-icono" aria-label="Editar franja" onClick={() => setEditar(t)}>
                         ✎
                       </button>
-                      <button type="button" className="boton-icono" aria-label="Borrar franja" onClick={() => setBorrar(t)}>
+                      <button type="button" className="boton-icono" aria-label="Borrar franja" onClick={() => borrarFranja(t)}>
                         ×
                       </button>
                     </span>
@@ -101,22 +109,6 @@ export function Tarifas({ canchaId }) {
           />
         )}
       </Dialogo>
-      <Confirmar
-        abierto={Boolean(borrar)}
-        titulo="¿Borrar esta franja?"
-        texto={borrar && `${DIAS[borrar.diaSemana]} ${borrar.horaInicio}:00–${borrar.horaFin}:00 quedará cerrado.`}
-        textoBoton="Borrar"
-        alCerrar={() => setBorrar(null)}
-        alConfirmar={async () => {
-          try {
-            await api.delete(`/tarifas/${borrar.id}`);
-            listo('Franja borrada.');
-          } catch (e) {
-            setAviso({ tono: 'peligro', texto: e.mensaje });
-          }
-          setBorrar(null);
-        }}
-      />
     </section>
   );
 }
@@ -211,15 +203,17 @@ export function Bloqueos({ canchaId }) {
     }
   };
 
-  const quitar = async b => {
-    try {
-      await api.delete(`/bloqueos/${b.id}`);
+  const quitar = b =>
+    confirmar({
+      titulo: '¿Abrir de nuevo este horario?',
+      html: `${fechaLarga(b.inicio)} · ${rangoHoras(b.inicio, b.fin)} volverá a estar libre para reservar.`,
+      boton: 'Sí, quitar bloqueo',
+      accion: () => api.delete(`/bloqueos/${b.id}`)
+    }).then(ok => {
+      if (!ok) return;
       setAviso({ tono: 'exito', texto: 'Bloqueo quitado: esas horas vuelven a estar libres.' });
       bloqueos.recargar();
-    } catch (e) {
-      setAviso({ tono: 'peligro', texto: e.mensaje });
-    }
-  };
+    });
 
   return (
     <section>

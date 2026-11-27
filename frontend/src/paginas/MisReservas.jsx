@@ -2,10 +2,11 @@
 //  src/paginas/MisReservas.jsx — reservas del jugador
 //
 //  Cada reserva muestra su estado y la acción que toca:
-//   • Esperando pago → ver QR del dueño, cuenta regresiva y "Subir
+//   • Esperando pago → anillo de cuenta regresiva, QR del dueño y "Subir
 //     comprobante" (foto + n.º de operación). Si ya lo subió: "En revisión".
 //   • Confirmada → "Cómo llegar", WhatsApp al dueño con texto listo, cancelar
-//     (avisando si pierde el adelanto según la regla 5).
+//     con alerta SweetAlert2 (avisa si pierde el adelanto, regla 5).
+//  Al enviar el comprobante o la reseña: celebración con confeti.
 //   • Jugada sin reseña → "Dejar reseña".
 //  No se muestran anuncios en esta pantalla: aquí se paga.
 // ============================================================================
@@ -14,21 +15,58 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../api/cliente';
 import { useCarga } from '../util/useCarga';
-import Dialogo, { Confirmar } from '../componentes/Dialogo';
+import Dialogo from '../componentes/Dialogo';
+import { celebrar, confirmar, fiesta } from '../util/alertas';
 import Campo from '../componentes/Campo';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
 import { ESTADOS_PAGO, ESTADOS_RESERVA, enlaceComoLlegar, enlaceWhatsApp, fechaLarga, minutosRestantes, rangoHoras, soles, textoReservaWhatsApp } from '../util/formato';
 
+// Anillo de cuenta regresiva (verde con tiempo de sobra, amarillo al final).
+function CuentaRegresiva({ minutos, total = 15 }) {
+  const fraccion = Math.max(0, Math.min(1, minutos / total));
+  return (
+    <span className="cuenta-regresiva" role="timer">
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="4" />
+        <circle cx="18" cy="18" r="15" fill="none" stroke={minutos > 5 ? '#bef264' : '#fcd34d'} strokeWidth="4" strokeLinecap="round" strokeDasharray="94.2" strokeDashoffset={94.2 * (1 - fraccion)} transform="rotate(-90 18 18)" />
+      </svg>
+      {minutos} min · {minutos > 5 ? 'tranqui, aún tienes tiempo' : 'ya casi: yapea ahorita'}
+    </span>
+  );
+}
+
 export default function MisReservas() {
-  const nueva = useLocation().state?.nueva;
+  const estadoRuta = useLocation().state;
+  const nueva = estadoRuta?.nueva;
   const [filtro, setFiltro] = useState('');
   const lista = useCarga(() => api.get('/reservas/mias', { params: { estado: filtro || undefined } }), [filtro]);
   const reglas = useCarga(() => api.get('/reglas'), []);
   const [pagar, setPagar] = useState(null);
-  const [cancelar, setCancelar] = useState(null);
   const [resenar, setResenar] = useState(null);
-  const [aviso, setAviso] = useState(nueva ? { tono: 'exito', texto: `Hora separada (reserva #${nueva}). Paga el adelanto y sube el comprobante antes de que se libere.` } : null);
+  const [aviso, setAviso] = useState(null);
   const [, refrescar] = useState(0);
+  const [pagoAbierto, setPagoAbierto] = useState(false);
+
+  // Si venimos de "Pagar ahora" en la celebración, abrimos el pago de esa reserva.
+  useEffect(() => {
+    if (pagoAbierto || !estadoRuta?.pagar || !lista.datos) return;
+    const r = lista.datos.find(x => x.id === nueva);
+    if (r) setPagar(r);
+    setPagoAbierto(true);
+  }, [lista.datos, estadoRuta, nueva, pagoAbierto]);
+
+  // Cancelar con SweetAlert2: avisa si pierde el adelanto (regla 5).
+  const cancelarReserva = r => {
+    const limite = reglas.datos?.horasCancelacion;
+    const horasAntes = (new Date(r.inicio) - Date.now()) / 3600000;
+    const pierde = r.estado === 'CONFIRMADA' && limite && horasAntes < limite;
+    const html = pierde
+      ? `Faltan menos de ${limite} horas:<br><b>perderías el adelanto de ${soles(r.adelanto)}</b>.`
+      : r.estado === 'CONFIRMADA'
+        ? 'Estás a tiempo: el dueño te devolverá el adelanto.'
+        : 'La hora se liberará para otros jugadores.';
+    confirmar({ titulo: '¿Cancelar la reserva?', html, boton: 'Sí, cancelar', cancelar: 'No, la mantengo', peligro: true, accion: () => api.post(`/reservas/${r.id}/cancelar`) }).then(res => res && terminar(res.mensaje));
+  };
 
   // Refresca la cuenta regresiva cada 30 s.
   useEffect(() => {
@@ -79,7 +117,7 @@ export default function MisReservas() {
           const futura = new Date(r.inicio) > new Date();
           const whatsapp = enlaceWhatsApp(r.cancha.telefono, textoReservaWhatsApp(r, r.cancha));
           return (
-            <article key={r.id} className={`tarjeta reserva ${r.id === nueva ? 'reserva-nueva' : ''}`}>
+            <article key={r.id} className={`tarjeta reserva reserva-${r.estado.toLowerCase()} ${r.id === nueva ? 'reserva-nueva' : ''}`}>
               <div className="fila-titulo">
                 <div>
                   <h3>{r.cancha.nombre}</h3>
@@ -93,7 +131,7 @@ export default function MisReservas() {
                 Total {soles(r.total)} · adelanto {soles(r.adelanto)}
                 {r.adelantoPerdido && <span className="texto-peligro"> · adelanto perdido por cancelar tarde</span>}
               </p>
-              {r.estado === 'PENDIENTE_PAGO' && !enRevision && min !== null && <p className="texto-aviso">Tienes {min} min para subir el comprobante; si no, la hora se libera.</p>}
+              {r.estado === 'PENDIENTE_PAGO' && !enRevision && min !== null && <CuentaRegresiva minutos={min} total={reglas.datos?.minutosSeparacion || 15} />}
               {ultimoPago?.estado === 'RECHAZADO' && r.estado === 'PENDIENTE_PAGO' && <p className="texto-peligro">El dueño rechazó tu comprobante: {ultimoPago.nota}</p>}
               <div className="fila-botones">
                 {r.estado === 'PENDIENTE_PAGO' && !enRevision && (
@@ -112,7 +150,7 @@ export default function MisReservas() {
                   </a>
                 )}
                 {['PENDIENTE_PAGO', 'CONFIRMADA'].includes(r.estado) && futura && (
-                  <button type="button" className="boton boton-peligro-suave" onClick={() => setCancelar(r)}>
+                  <button type="button" className="boton boton-peligro-suave" onClick={() => cancelarReserva(r)}>
                     Cancelar
                   </button>
                 )}
@@ -138,9 +176,24 @@ export default function MisReservas() {
         })}
       </div>
 
-      <DialogoPago reserva={pagar} alCerrar={() => setPagar(null)} alTerminar={() => { setPagar(null); terminar('Comprobante enviado. El dueño lo revisará y tu reserva quedará confirmada.'); }} />
-      <DialogoCancelar reserva={cancelar} horasLimite={reglas.datos?.horasCancelacion} alCerrar={() => setCancelar(null)} alTerminar={m => { setCancelar(null); terminar(m); }} />
-      <DialogoResena reserva={resenar} alCerrar={() => setResenar(null)} alTerminar={() => { setResenar(null); terminar('¡Gracias por tu reseña!'); }} />
+      <DialogoPago
+        reserva={pagar}
+        alCerrar={() => setPagar(null)}
+        alTerminar={() => {
+          setPagar(null);
+          lista.recargar();
+          celebrar({ titulo: '¡Comprobante enviado!', html: 'El dueño lo revisará y tu reserva quedará <b>confirmada</b>. Te esperamos en la cancha ⚽' });
+        }}
+      />
+      <DialogoResena
+        reserva={resenar}
+        alCerrar={() => setResenar(null)}
+        alTerminar={() => {
+          setResenar(null);
+          fiesta();
+          terminar('¡Gracias por tu reseña!');
+        }}
+      />
     </div>
   );
 }
@@ -205,46 +258,6 @@ function DialogoPago({ reserva, alCerrar, alTerminar }) {
         </form>
       )}
     </Dialogo>
-  );
-}
-
-// Cancelar con aviso de la regla 5 (pierde el adelanto si cancela tarde).
-function DialogoCancelar({ reserva, horasLimite, alCerrar, alTerminar }) {
-  const [ocupado, setOcupado] = useState(false);
-  const [error, setError] = useState(null);
-  if (!reserva) return <Confirmar abierto={false} alCerrar={alCerrar} />;
-  const horasAntes = (new Date(reserva.inicio) - Date.now()) / 3600000;
-  const pierde = reserva.estado === 'CONFIRMADA' && horasLimite && horasAntes < horasLimite;
-  const texto = pierde
-    ? `Faltan menos de ${horasLimite} horas: si cancelas ahora pierdes el adelanto de ${soles(reserva.adelanto)}.`
-    : reserva.estado === 'CONFIRMADA'
-      ? 'Estás a tiempo: el dueño te devolverá el adelanto.'
-      : 'La hora se liberará para otros jugadores.';
-  return (
-    <Confirmar
-      abierto
-      titulo="¿Cancelar la reserva?"
-      texto={
-        <>
-          {texto}
-          {error && <MensajeError error={error} />}
-        </>
-      }
-      textoBoton="Sí, cancelar"
-      ocupado={ocupado}
-      alCerrar={alCerrar}
-      alConfirmar={async () => {
-        setOcupado(true);
-        try {
-          const r = await api.post(`/reservas/${reserva.id}/cancelar`);
-          alTerminar(r.mensaje);
-        } catch (e) {
-          setError(e);
-        } finally {
-          setOcupado(false);
-        }
-      }}
-    />
   );
 }
 

@@ -7,7 +7,10 @@
 //   • Usuarios: CRUD en diálogos (crear dueños, cambiar rol, desactivar).
 //   • Reservas: listado global con filtro y paginación.
 //   • Reseñas: moderación.
+//   • Imágenes del sitio: fondos de portada, ingreso y cancha sin foto
+//     (subir y recortar, o URL; ordenar, pausar, borrar).
 //   • Anuncios: CRUD con impresiones, clics y tasa, para cobrar al anunciante.
+//  Todo borrado pide confirmación con SweetAlert2.
 // ============================================================================
 
 import { useState } from 'react';
@@ -15,7 +18,9 @@ import api from '../api/cliente';
 import { useCarga } from '../util/useCarga';
 import { useSesion } from '../contexto/Sesion';
 import { PanelCanchas } from './PanelDueno';
-import Dialogo, { Confirmar } from '../componentes/Dialogo';
+import ImagenesSitio from './panel/ImagenesSitio';
+import { aviso as toast, confirmar, seguro } from '../util/alertas';
+import Dialogo from '../componentes/Dialogo';
 import Campo, { Casilla } from '../componentes/Campo';
 import { Aviso, Cargando, Etiqueta, MensajeError, Vacio } from '../componentes/Estado';
 import { ESTADOS_RESERVA, fechaCorta, fechaLarga, fechaLocal, hoyCusco, rangoHoras, soles } from '../util/formato';
@@ -26,6 +31,7 @@ const PESTANAS = [
   { id: 'canchas', texto: 'Canchas' },
   { id: 'reservas', texto: 'Reservas' },
   { id: 'pagos', texto: 'Pagos' },
+  { id: 'imagenes', texto: 'Imágenes del sitio' },
   { id: 'anuncios', texto: 'Anuncios' },
   { id: 'resenas', texto: 'Reseñas' },
   { id: 'calendario', texto: 'Calendario' },
@@ -47,6 +53,7 @@ export default function PanelAdmin() {
         resumen: <Resumen />,
         usuarios: <Usuarios alCambiar={duenos.recargar} />,
         reservas: <Reservas />,
+        imagenes: <ImagenesSitio />,
         anuncios: <Anuncios />,
         resenas: <Resenas />
       }}
@@ -89,7 +96,6 @@ function Usuarios({ alCambiar }) {
   const [pagina, setPagina] = useState(1);
   const lista = useCarga(() => api.get('/admin/usuarios', { params: { q: q || undefined, rol: rol || undefined, pagina, porPagina: 15 } }), [q, rol, pagina]);
   const [editar, setEditar] = useState(null);
-  const [borrar, setBorrar] = useState(null);
   const [aviso, setAviso] = useState(null);
 
   const listo = texto => {
@@ -97,6 +103,14 @@ function Usuarios({ alCambiar }) {
     lista.recargar();
     alCambiar();
   };
+  const borrarUsuario = u =>
+    confirmar({
+      titulo: '¿Borrar usuario?',
+      html: `<b>${seguro(u.nombre)}</b> se borrará para siempre. Si tiene canchas o reservas, mejor desactívalo.`,
+      boton: 'Sí, borrar',
+      peligro: true,
+      accion: () => api.delete(`/admin/usuarios/${u.id}`)
+    }).then(ok => ok && listo('Usuario borrado.'));
 
   return (
     <section>
@@ -156,7 +170,7 @@ function Usuarios({ alCambiar }) {
                       Editar
                     </button>
                     {u.id !== yo.id && (
-                      <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => setBorrar(u)}>
+                      <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => borrarUsuario(u)}>
                         Borrar
                       </button>
                     )}
@@ -192,35 +206,7 @@ function Usuarios({ alCambiar }) {
           />
         )}
       </Dialogo>
-      <BorrarUsuario usuario={borrar} alCerrar={() => setBorrar(null)} alTerminar={() => { setBorrar(null); listo('Usuario borrado.'); }} />
     </section>
-  );
-}
-
-function BorrarUsuario({ usuario, alCerrar, alTerminar }) {
-  const [error, setError] = useState(null);
-  return (
-    <Confirmar
-      abierto={Boolean(usuario)}
-      titulo="¿Borrar usuario?"
-      texto={
-        <>
-          {usuario?.nombre} se borrará para siempre. Si tiene canchas o reservas, mejor desactívalo.
-          {error && <MensajeError error={error} />}
-        </>
-      }
-      textoBoton="Borrar"
-      alCerrar={() => { setError(null); alCerrar(); }}
-      alConfirmar={async () => {
-        try {
-          await api.delete(`/admin/usuarios/${usuario.id}`);
-          setError(null);
-          alTerminar();
-        } catch (e) {
-          setError(e);
-        }
-      }}
-    />
   );
 }
 
@@ -350,7 +336,12 @@ function Reservas() {
 
 function Resenas() {
   const lista = useCarga(() => api.get('/admin/resenas'), []);
-  const [borrar, setBorrar] = useState(null);
+  const borrarResena = r =>
+    confirmar({ titulo: '¿Borrar reseña?', html: 'Úsalo solo si es ofensiva o falsa.', boton: 'Sí, borrar', peligro: true, accion: () => api.delete(`/admin/resenas/${r.id}`) }).then(ok => {
+      if (!ok) return;
+      toast('Reseña borrada');
+      lista.recargar();
+    });
   return (
     <section>
       <h2>Reseñas</h2>
@@ -362,24 +353,12 @@ function Resenas() {
           <li key={r.id}>
             <span>{'★'.repeat(r.estrellas)}</span> <strong>{r.cancha}</strong> · {r.jugador} · {fechaLarga(r.creadoEn)}
             {r.texto && <div className="texto-suave">{r.texto}</div>}
-            <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => setBorrar(r)}>
+            <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => borrarResena(r)}>
               Borrar
             </button>
           </li>
         ))}
       </ul>
-      <Confirmar
-        abierto={Boolean(borrar)}
-        titulo="¿Borrar reseña?"
-        texto="Úsalo solo si es ofensiva o falsa."
-        textoBoton="Borrar"
-        alCerrar={() => setBorrar(null)}
-        alConfirmar={async () => {
-          await api.delete(`/admin/resenas/${borrar.id}`).catch(() => {});
-          setBorrar(null);
-          lista.recargar();
-        }}
-      />
     </section>
   );
 }
@@ -387,12 +366,13 @@ function Resenas() {
 function Anuncios() {
   const lista = useCarga(() => api.get('/admin/anuncios'), []);
   const [editar, setEditar] = useState(null);
-  const [borrar, setBorrar] = useState(null);
-  const [aviso, setAviso] = useState(null);
+  const [avisoAnuncio, setAvisoAnuncio] = useState(null);
   const listo = t => {
-    setAviso({ tono: 'exito', texto: t });
+    setAvisoAnuncio({ tono: 'exito', texto: t });
     lista.recargar();
   };
+  const borrarAnuncio = a =>
+    confirmar({ titulo: '¿Borrar anuncio?', html: 'Se perderán sus estadísticas. Si solo terminó el contrato, mejor páusalo.', boton: 'Sí, borrar', peligro: true, accion: () => api.delete(`/admin/anuncios/${a.id}`) }).then(ok => ok && listo('Anuncio borrado.'));
   const hoy = new Date();
   return (
     <section>
@@ -403,9 +383,9 @@ function Anuncios() {
         </button>
       </div>
       <p className="texto-suave">Se muestran como máximo uno cada 6 canchas y uno en cada ficha; nunca al reservar o pagar. Cobra por mes y usa las impresiones y clics como reporte.</p>
-      {aviso && (
-        <Aviso tono={aviso.tono} alCerrar={() => setAviso(null)}>
-          {aviso.texto}
+      {avisoAnuncio && (
+        <Aviso tono={avisoAnuncio.tono} alCerrar={() => setAvisoAnuncio(null)}>
+          {avisoAnuncio.texto}
         </Aviso>
       )}
       {lista.cargando && !lista.datos && <Cargando />}
@@ -451,7 +431,7 @@ function Anuncios() {
                       <button type="button" className="boton boton-chico" onClick={() => setEditar(a)}>
                         Editar
                       </button>
-                      <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => setBorrar(a)}>
+                      <button type="button" className="boton boton-chico boton-peligro-suave" onClick={() => borrarAnuncio(a)}>
                         Borrar
                       </button>
                     </td>
@@ -474,18 +454,6 @@ function Anuncios() {
           />
         )}
       </Dialogo>
-      <Confirmar
-        abierto={Boolean(borrar)}
-        titulo="¿Borrar anuncio?"
-        texto={`Se perderán sus estadísticas. Si solo terminó el contrato, mejor páusalo.`}
-        textoBoton="Borrar"
-        alCerrar={() => setBorrar(null)}
-        alConfirmar={async () => {
-          await api.delete(`/admin/anuncios/${borrar.id}`).catch(() => {});
-          setBorrar(null);
-          listo('Anuncio borrado.');
-        }}
-      />
     </section>
   );
 }

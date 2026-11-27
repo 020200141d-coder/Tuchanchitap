@@ -53,7 +53,26 @@ Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. E
 - CRUD de usuarios: crear dueños, cambiar roles y desactivar cuentas.
 - Todas las canchas (con reasignación de dueño), reservas, pagos, moderación de reseñas y CRUD de anuncios con impresiones, clics y tasa de clics.
 
-Estados en todas las pantallas: **cargando**, **error** (con botón para reintentar), **vacío** (con una acción sugerida) y **éxito**.
+Estados en todas las pantallas: **cargando** (esqueletos con brillo), **error** (con botón para reintentar), **vacío** (con una acción sugerida) y **éxito** (avisos tipo toast).
+
+### Diseño "Noche de estadio"
+
+Elegido entre 6 propuestas (láminas en `docs/diseno/`). Una cancha de noche bajo los reflectores: verde noche, fotos reales de fondo, tarjetas de vidrio y verde lima neón para lo que se toca. Letra *Bebas Neue* en los títulos y *Nunito* para leer.
+
+- **Portada:** carrusel de fotos que "respiran" (zoom lento), reflectores que se encienden al cargar, título que se escribe solo y contador animado de canchas.
+- **Tarjetas:** foto, insignia "Libre hoy HH:00", inclinación 3D con el mouse y **horas libres de hoy** como botones para reservar en dos toques.
+- **SweetAlert2 en todas las acciones:** confirmar reserva (con resumen y cargando), celebración con **confeti** y "Avisar al equipo" por WhatsApp, cancelar (avisa si pierde el adelanto), aprobar o rechazar pagos (motivo dentro de la alerta), borrar en los paneles y avisos tipo toast.
+- **Mis reservas:** anillo de cuenta regresiva con mensajes tranquilos ("tranqui, aún tienes tiempo").
+- **Accesibilidad:** con "reducir movimiento" activado en el sistema, las animaciones se apagan.
+
+### Imágenes del sitio (administrables)
+
+En **Admin → Imágenes del sitio** se cambian sin tocar código:
+- **Portada:** fotos del carrusel del inicio.
+- **Ingreso:** fondo de ingresar y crear cuenta.
+- **Cancha sin foto:** imagen que se usa cuando una cancha aún no subió fotos.
+
+Cada imagen se agrega **subiendo y recortando** (Cropper.js, con la proporción de su lugar) o pegando una URL. Se puede **ordenar, pausar o activar, editar y borrar**. La API impide dejar un lugar sin imágenes. La semilla trae fotos libres de Unsplash con su crédito (Paul Lora, Tahamie Farooqui, Jose G. Ortega Castro e Izuddin Helmi Adnan), para reemplazarlas por fotos reales.
 
 ## Stack y decisiones de costo cero
 
@@ -61,13 +80,14 @@ Estados en todas las pantallas: **cargando**, **error** (con botón para reinten
 | --- | --- |
 | API | Node.js 22, Express 5, Prisma 6 + PostgreSQL, Zod, jsonwebtoken + bcryptjs, helmet, cors, express-rate-limit, multer, swagger-ui-express |
 | Pruebas | Jest + Supertest (base en memoria que imita a Prisma) |
-| Frontend | React 19 + Vite (JavaScript), React Router 7, Axios con interceptor del JWT, Leaflet + react-leaflet |
+| Frontend | React 19 + Vite (JavaScript), React Router 7, Axios con interceptor del JWT, Leaflet + react-leaflet, SweetAlert2, canvas-confetti, Cropper.js |
 | Datos | PostgreSQL en **Supabase** (plan gratis) y Supabase Storage para las fotos |
 | Despliegue | **Render** (plan gratis) con `render.yaml`, y GitHub Actions como CI |
 
 | Necesidad | Opción de pago descartada | Opción gratis usada |
 | --- | --- | --- |
-| Mapa | Google Maps API | Leaflet + teselas de OpenStreetMap |
+| Mapa | Google Maps API | Leaflet + datos de OpenStreetMap con estilo oscuro gratuito de CARTO |
+| Fotos de fondo | Bancos de imágenes de pago | Fotos libres de Unsplash (con crédito), reemplazables desde el panel |
 | Buscar dirección | Google Places | Nominatim (1 consulta/s, solo al registrar una cancha) |
 | Cómo llegar | Directions API | Enlace `https://www.google.com/maps/dir/?api=1&destination=LAT,LNG` |
 | Cobrar adelanto | Pasarela con comisión | Yape/Plin manual: QR del dueño, foto del comprobante y aprobación |
@@ -103,7 +123,7 @@ frontend/src
 
 ## Modelo de datos
 
-8 entidades relacionadas (`backend/prisma/schema.prisma`), con 2 migraciones en `backend/prisma/migrations`.
+9 entidades relacionadas (`backend/prisma/schema.prisma`), con 3 migraciones en `backend/prisma/migrations`.
 
 ```mermaid
 erDiagram
@@ -125,6 +145,7 @@ erDiagram
 - **Pago:** YAPE/PLIN, número de operación (único) y foto.
 - **Resena:** una por reserva.
 - **Anuncio:** vigencia y estadísticas de impresiones y clics.
+- **ImagenSitio:** lugar (PORTADA/INGRESO/CANCHA_SIN_FOTO), URL, crédito, orden y activa.
 
 ## Reglas de negocio (probadas en Jest)
 
@@ -241,7 +262,8 @@ La lista completa con ejemplos está en **Swagger: `/docs`** (archivo en `/docs.
 | `GET /api/pagos` · `POST /api/pagos/:id/aprobar` · `/rechazar` | dueño/admin | Revisar pagos |
 | `POST /api/reservas/:id/resena` · `GET /api/canchas/:id/resenas` | jugador / público | Reseñas |
 | `GET /api/anuncios?zona` · `POST /api/anuncios/:id/clic` | público | Anuncios |
-| `/api/admin/resumen`, `/usuarios`, `/reservas`, `/resenas`, `/anuncios` | admin | Panel de administración |
+| `GET /api/imagenes?lugar` | público | Imágenes activas del sitio |
+| `/api/admin/resumen`, `/usuarios`, `/reservas`, `/resenas`, `/anuncios`, `/imagenes` | admin | Panel de administración |
 
 ## Pruebas, cobertura y Postman
 
@@ -257,13 +279,13 @@ npm test
 npm run cobertura
 ```
 
-Resultado actual: **90 pruebas en 8 archivos**, todas pasan. Cobertura:
+Resultado actual: **94 pruebas en 9 archivos**, todas pasan. Cobertura:
 
 | Capa | Sentencias | Ramas | Funciones | Líneas |
 | --- | --- | --- | --- | --- |
-| `src/servicios` | 98.7 % | 92.7 % | 100 % | 100 % |
-| `src/validadores` | 100 % | 84.6 % | 100 % | 100 % |
-| Total medido | 97.4 % | 89.7 % | 99.3 % | 98.5 % |
+| `src/servicios` | 98.8 % | 93.0 % | 100 % | 100 % |
+| `src/validadores` | 99.1 % | 70.6 % | 95.5 % | 99.0 % |
+| Total medido | 97.5 % | 89.5 % | 98.8 % | 98.4 % |
 
 `jest.config.js` exige un mínimo de 70 % en servicios, y GitHub Actions corre las pruebas en cada push (`.github/workflows/ci.yml`). El reporte HTML queda en `backend/coverage/lcov-report/index.html`.
 

@@ -1,9 +1,9 @@
 // ============================================================================
 //  src/componentes/Mapa.jsx — mapas con Leaflet + OpenStreetMap (gratis)
 //
-//  ¿Por qué no Google Maps?  Su API pide tarjeta. Las teselas de
-//  OpenStreetMap son gratuitas para un uso moderado como este (con la
-//  atribución visible, que es obligatoria).
+//  ¿Por qué no Google Maps?  Su API pide tarjeta. Usamos los datos de
+//  OpenStreetMap con el estilo oscuro gratuito de CARTO ("dark matter"), que
+//  combina con el tema Noche de estadio. La atribución visible es obligatoria.
 //
 //  • MapaCanchas: todas las canchas del listado como pines; al tocar uno se
 //    abre un globo con el enlace a su ficha. Si el jugador compartió su
@@ -27,7 +27,7 @@ const pin = new L.DivIcon({ className: 'pin', html: '<span></span>', iconSize: [
 const puntoYo = new L.DivIcon({ className: 'pin-yo', html: '<span></span>', iconSize: [16, 16], iconAnchor: [8, 8] });
 
 function Teselas() {
-  return <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' maxZoom={19} />;
+  return <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>' subdomains="abcd" maxZoom={20} />;
 }
 
 // Ajusta el encuadre para que se vean todos los pines.

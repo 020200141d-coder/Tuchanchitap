@@ -3,7 +3,8 @@
 //
 //  Después de entrar, vuelve a la pantalla de donde vino la persona (por
 //  ejemplo, la cancha que quería reservar) o a su panel según el rol.
-//  Los errores de la API se muestran junto a cada campo.
+//  Los errores de la API se muestran junto a cada campo. Fondo: la foto de
+//  "ingreso" del panel admin; al entrar, un toast de bienvenida.
 // ============================================================================
 
 import { useState } from 'react';
@@ -11,6 +12,19 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSesion } from '../contexto/Sesion';
 import Campo from '../componentes/Campo';
 import { MensajeError } from '../componentes/Estado';
+import { useImagenes } from '../contexto/Imagenes';
+import { aviso } from '../util/alertas';
+
+// Fondo con la foto de 'ingreso' que elige el admin (Imágenes del sitio).
+function PantallaAcceso({ children }) {
+  const { ingreso } = useImagenes();
+  return (
+    <div className="pantalla-acceso">
+      {ingreso[0] && <div className="fondo" style={{ backgroundImage: `url("${ingreso[0].url}")` }} aria-hidden="true" />}
+      {children}
+    </div>
+  );
+}
 
 const destinoPorRol = rol => ({ ADMIN: '/admin', DUENO: '/panel' })[rol] || '/';
 
@@ -34,6 +48,7 @@ export function Ingresar() {
     f.setError(null);
     try {
       const u = await ingresar(f.datos);
+      aviso(`¡Hola, ${u.nombre.split(' ')[0]}! ⚽`);
       navegar(desde || destinoPorRol(u.rol), { replace: true });
     } catch (err) {
       f.setError(err);
@@ -43,9 +58,10 @@ export function Ingresar() {
   };
 
   return (
-    <div className="contenedor contenedor-angosto">
+    <PantallaAcceso>
       <form className="tarjeta formulario" onSubmit={enviar} noValidate>
-        <h1>Ingresar</h1>
+        <h1>¡Vuelve a la cancha!</h1>
+        <p className="texto-suave">Ingresa para separar tu hora.</p>
         <Campo etiqueta="Correo" error={f.error?.campos?.email}>
           <input type="email" autoComplete="email" placeholder="tucorreo@gmail.com" value={f.datos.email} onChange={f.cambiar('email')} required />
         </Campo>
@@ -60,7 +76,7 @@ export function Ingresar() {
           ¿No tienes cuenta? <Link to="/registro" state={{ desde }}>Crea una gratis</Link>
         </p>
       </form>
-    </div>
+    </PantallaAcceso>
   );
 }
 
@@ -77,6 +93,7 @@ export function Registro() {
     try {
       const { telefono, ...resto } = f.datos;
       const u = await registrar(telefono ? { ...resto, telefono } : resto);
+      aviso(`¡Bienvenido al equipo, ${u.nombre.split(' ')[0]}!`);
       navegar(desde || destinoPorRol(u.rol), { replace: true });
     } catch (err) {
       f.setError(err);
@@ -87,16 +104,19 @@ export function Registro() {
 
   const c = f.error?.campos || {};
   return (
-    <div className="contenedor contenedor-angosto">
+    <PantallaAcceso>
       <form className="tarjeta formulario" onSubmit={enviar} noValidate>
-        <h1>Crear cuenta</h1>
+        <h1>Únete al equipo</h1>
+        <p className="texto-suave">Gratis. Reserva en un minuto.</p>
         <fieldset className="selector-rol">
           <legend className="campo-etiqueta">¿Para qué la usarás?</legend>
-          <label className="casilla">
-            <input type="radio" name="rol" checked={f.datos.rol === 'JUGADOR'} onChange={() => f.setDatos(d => ({ ...d, rol: 'JUGADOR' }))} /> Quiero reservar canchas
+          <label className="opcion-rol">
+            <input type="radio" name="rol" checked={f.datos.rol === 'JUGADOR'} onChange={() => f.setDatos(d => ({ ...d, rol: 'JUGADOR' }))} />
+            <span aria-hidden="true">⚽</span>Quiero jugar
           </label>
-          <label className="casilla">
-            <input type="radio" name="rol" checked={f.datos.rol === 'DUENO'} onChange={() => f.setDatos(d => ({ ...d, rol: 'DUENO' }))} /> Tengo una cancha
+          <label className="opcion-rol">
+            <input type="radio" name="rol" checked={f.datos.rol === 'DUENO'} onChange={() => f.setDatos(d => ({ ...d, rol: 'DUENO' }))} />
+            <span aria-hidden="true">🏟️</span>Tengo una cancha
           </label>
         </fieldset>
         <Campo etiqueta="Nombre y apellido" error={c.nombre}>
@@ -119,6 +139,6 @@ export function Registro() {
           ¿Ya tienes cuenta? <Link to="/ingresar">Ingresa</Link>
         </p>
       </form>
-    </div>
+    </PantallaAcceso>
   );
 }
