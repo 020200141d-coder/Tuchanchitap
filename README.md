@@ -95,6 +95,8 @@ El archivo `.env` no se sube al repositorio.
 
 ## Documentación
 
+- **[Avance del proyecto](docs/AVANCE.md)**: diseño de cada pantalla junto con su estado en el código
+- [Diseño navegable de las pantallas](https://claude.ai/artifact/97fFTfsrfF3E3vEDqQy5vu)
 - [Propuesta del proyecto](docs/Propuesta_Proyecto.docx)
 - [Evidencias del Hito 1](docs/Hito1_Evidencias.docx)
 - [Diagrama entidad-relación](docs/diagramas/entidad-relacion.png)
