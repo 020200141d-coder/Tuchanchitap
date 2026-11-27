@@ -9,9 +9,10 @@ Plataforma para reservar **canchitas de fulbito** del círculo local de Cusco. E
 
 | Integrante | Módulos |
 | --- | --- |
-| Aguirre Bravo, Edson Francisco Lino | Usuarios y autenticación · Canchas · Frontend · Despliegue |
-| Estudiante 2 _(por completar)_ | Reservas |
-| Estudiante 3 _(por completar)_ | Pagos · Reportes y panel admin |
+| Aguirre Bravo, Edson Francisco Lino | Usuarios y autenticación · Canchas · Despliegue |
+| Estudiante 2 _(por completar)_ | Reservas · Tarifas y bloqueos |
+| Estudiante 3 _(por completar)_ | Pagos Yape/Plin · Reseñas · Panel admin |
+| Estudiante 4 _(por completar)_ | Frontend React · Pruebas (Jest, Postman) |
 
 **Documentos del Hito 1** (en `docs/`): propuesta (`Propuesta_Proyecto.docx`), evidencias (`Hito1_Evidencias.docx`), avance (`AVANCE.md`), diagramas de arquitectura y entidad-relación (`docs/diagramas/`) y pantallas del diseño (`docs/pantallas/`). En esta versión, el pago en línea con Mercado Pago del Hito 1 se reemplazó por Yape/Plin manual, para mantener el **costo cero**.
 
