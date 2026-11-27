@@ -17,6 +17,7 @@ router.use('/api/canchas', require('./canchas'));
 router.use('/api', require('./horarios'));
 router.use('/api', require('./reservas'));
 router.use('/api', require('./pagos'));
+router.use('/api/anuncios', require('./anuncios'));
 router.use('/api/admin', require('./admin'));
 
 module.exports = router;

@@ -8,8 +8,8 @@
 //    • Modo demo en memoria: server.js la carga al arrancar sin DATABASE_URL.
 //   Solo usa create() sencillos, que ambos clientes entienden igual.
 //
-//  ⚠ Las canchas son FICTICIAS (nombres inventados, ubicaciones aproximadas en
-//  Cusco). Reemplázalas por las reales de tu círculo cuando las tengas.
+//  Las canchas son reales (datos públicos, ver CANCHAS); usuarios, reservas
+//  y anuncios son FICTICIOS.
 //
 //  Contraseña de los usuarios de prueba: variable SEMILLA_PASSWORD de .env o,
 //  si falta, la de desarrollo indicada en el README. Son cuentas de prueba, no
@@ -41,14 +41,20 @@ function tarifasTipo(base, { abre = 8, cierra = 23, nocheDesde = 18 } = {}) {
   return lista;
 }
 
+// Canchitas REALES de Cusco, armadas con datos públicos de directorios y
+// redes sociales (nov. 2026): nombre, dirección, zona y WhatsApp donde se
+// encontró. Lo que NO está publicado (coordenadas exactas, precios, formato,
+// horario) es APROXIMADO y está marcado "por confirmar": corrígelo cuando
+// hables con cada dueño. Las cuentas de dueño de la semilla son de prueba;
+// el dueño real todavía no administra estas fichas.
+const NOTA = ' Datos públicos; precio, horario y ubicación exacta por confirmar con el dueño.';
 const CANCHAS = [
-  { dueno: 'dueno1', nombre: 'La Bombonera de Wanchaq (ficticia)', zona: 'Wanchaq', direccion: 'Av. Garcilaso (referencial)', lat: -13.5262, lng: -71.9662, tipo: 'SINTETICO', formato: 7, techada: false, conLuz: true, base: 50, descripcion: 'Grass sintético, vestuarios y estacionamiento.' },
-  { dueno: 'dueno1', nombre: 'Techito Marcavalle (ficticia)', zona: 'Marcavalle', direccion: 'Av. Los Incas (referencial)', lat: -13.5312, lng: -71.9529, tipo: 'SINTETICO', formato: 5, techada: true, conLuz: true, base: 40, descripcion: 'Techada: se juega aunque llueva.' },
-  { dueno: 'dueno1', nombre: 'Losa Ttio (ficticia)', zona: 'Ttio', direccion: 'Calle principal de Ttio (referencial)', lat: -13.5338, lng: -71.9605, tipo: 'LOSA', formato: 5, techada: false, conLuz: false, base: 25, descripcion: 'Losa de cemento, ideal para pichangas de la mañana.', abre: 7, cierra: 18 },
-  { dueno: 'dueno2', nombre: 'Estadio Chico San Sebastián (ficticia)', zona: 'San Sebastián', direccion: 'Av. de la Cultura (referencial)', lat: -13.5297, lng: -71.9361, tipo: 'GRASS', formato: 11, techada: false, conLuz: true, base: 120, descripcion: 'Grass natural, medidas reglamentarias.' },
-  { dueno: 'dueno2', nombre: 'La Cancha de Larapa (ficticia)', zona: 'Larapa', direccion: 'Urb. Larapa (referencial)', lat: -13.5391, lng: -71.9152, tipo: 'SINTETICO', formato: 7, techada: false, conLuz: true, base: 45, descripcion: 'Amplia, con tribuna pequeña.' },
-  { dueno: 'dueno2', nombre: 'Fulbito Santiago Techado (ficticia)', zona: 'Santiago', direccion: 'Av. Antonio Lorena (referencial)', lat: -13.5318, lng: -71.9853, tipo: 'SINTETICO', formato: 5, techada: true, conLuz: true, base: 40, descripcion: 'Techada y con cafetín.' },
-  { dueno: 'dueno2', nombre: 'Cancha San Jerónimo (borrador, ficticia)', zona: 'San Jerónimo', direccion: 'Av. Manco Cápac (referencial)', lat: -13.5452, lng: -71.8873, tipo: 'LOSA', formato: 5, techada: false, conLuz: true, base: 30, descripcion: 'Aún no publicada: solo la ve su dueño.', publicada: false }
+  { dueno: 'dueno1', nombre: 'La Cancha de Cusco', zona: 'Wanchaq', direccion: 'Av. Las Américas E-24, Parque Industrial', lat: -13.5251, lng: -71.9585, tipo: 'SINTETICO', formato: 7, techada: false, conLuz: true, base: 50, telefono: null, descripcion: 'Complejo de fulbito con canchas sintéticas, servicios higiénicos, duchas y cafetería.' + NOTA },
+  { dueno: 'dueno1', nombre: 'El Monumental de San Antonio', zona: 'San Sebastián', direccion: 'Urb. San Antonio E-12, Vía de Evitamiento', lat: -13.5362, lng: -71.9288, tipo: 'SINTETICO', formato: 7, techada: true, conLuz: true, base: 50, telefono: '51958192165', descripcion: 'Cancha sintética techada: se juega aunque llueva.' + NOTA },
+  { dueno: 'dueno1', nombre: 'Cancha Sintética Agua Buena', zona: 'San Sebastián', direccion: 'Urb. Agua Buena, cerca de la Vía de Evitamiento', lat: -13.5395, lng: -71.9238, tipo: 'SINTETICO', formato: 7, techada: false, conLuz: true, base: 45, telefono: null, descripcion: 'Estacionamiento amplio, tribunas y parque para niños; también tiene losa de fulbito.' + NOTA },
+  { dueno: 'dueno2', nombre: 'El Retador de San Miguel', zona: 'San Sebastián', direccion: 'Pasaje San Sebastián 051', lat: -13.5318, lng: -71.9372, tipo: 'SINTETICO', formato: 5, techada: false, conLuz: true, base: 40, telefono: null, descripcion: 'Cancha sintética de barrio. Paraderos cercanos: RTU-04, RTU-18 y RTU-25.' + NOTA },
+  { dueno: 'dueno2', nombre: 'Cancha Los Waykis', zona: 'San Sebastián', direccion: 'San Sebastián (dirección por confirmar)', lat: -13.5335, lng: -71.9305, tipo: 'SINTETICO', formato: 5, techada: false, conLuz: true, base: 40, telefono: '51969700745', descripcion: 'Cancha sintética con reservas por WhatsApp.' + NOTA },
+  { dueno: 'dueno2', nombre: 'Cancha de ejemplo (borrador, ficticia)', zona: 'San Jerónimo', direccion: 'Av. Manco Cápac (referencial)', lat: -13.5452, lng: -71.8873, tipo: 'LOSA', formato: 5, techada: false, conLuz: true, base: 30, telefono: null, descripcion: 'Aún no publicada: solo la ve su dueño. Sirve para probar el modo borrador.', publicada: false }
 ];
 
 async function cargarSemilla(db, { ahora = new Date() } = {}) {
@@ -76,7 +82,7 @@ async function cargarSemilla(db, { ahora = new Date() } = {}) {
         lng: c.lng,
         direccion: c.direccion,
         zona: c.zona,
-        telefono: dueno.telefono,
+        telefono: c.telefono, // solo el WhatsApp público real; si no hay, el botón no aparece
         fotos: [],
         publicada: c.publicada !== false
       }
@@ -106,6 +112,16 @@ async function cargarSemilla(db, { ahora = new Date() } = {}) {
   // Un bloqueo de mantenimiento pasado mañana por la mañana.
   const pasado = sumarDias(hoy, 2);
   await db.bloqueo.create({ data: { canchaId: canchas[1].id, inicio: aUtc(pasado, 8), fin: aUtc(pasado, 11), motivo: 'MANTENIMIENTO', nota: 'Cambio de redes (ejemplo)' } });
+
+  // Anuncios de ejemplo (negocios FICTICIOS), vigentes 60 días.
+  const desde = aUtc(hoy, 0);
+  const hasta = aUtc(sumarDias(hoy, 60), 24);
+  const anuncios = [
+    { anunciante: 'Deportes El Crack (ficticio)', titulo: 'Chimpunes con 10 % de descuento', texto: 'Cerca de Parque Industrial. Muestra tu reserva de tukanchitape.', zona: 'Wanchaq', enlace: 'https://wa.me/51984000099' },
+    { anunciante: 'Juguería La Pichanga (ficticia)', titulo: 'Jugo + agua después del partido', texto: 'Combo a S/ 6 para el equipo que acaba de jugar.', zona: 'San Sebastián', enlace: null },
+    { anunciante: 'Fisio Cusco Sport (ficticio)', titulo: '¿Te torciste el tobillo?', texto: 'Evaluación de lesiones deportivas. Primera consulta con descuento.', zona: null, enlace: null }
+  ];
+  for (const a of anuncios) await db.anuncio.create({ data: { ...a, desde, hasta } });
 
   return { usuarios, canchas };
 }

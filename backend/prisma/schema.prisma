@@ -172,6 +172,28 @@ model Pago {
   @@unique([metodo, numeroOperacion])
 }
 
+// Anuncios de negocios del barrio (tienda deportiva, juguería…) que pagan
+// directo al administrador. Se muestran poco y siempre con la etiqueta
+// "Anuncio": como máximo uno cada 6 canchas en el listado y uno en la ficha;
+// nunca en las pantallas de reservar o pagar. `zona` null = toda la ciudad.
+model Anuncio {
+  id          Int      @id @default(autoincrement())
+  anunciante  String
+  titulo      String
+  texto       String
+  enlace      String?  // web, Facebook o wa.me del anunciante
+  imagenUrl   String?
+  zona        String?
+  activo      Boolean  @default(true)
+  desde       DateTime
+  hasta       DateTime
+  impresiones Int      @default(0)
+  clics       Int      @default(0)
+  creadoEn    DateTime @default(now())
+
+  @@index([activo, desde, hasta])
+}
+
 model Resena {
   id         Int      @id @default(autoincrement())
   reservaId  Int      @unique // regla 7: una reseña por reserva

@@ -8,7 +8,7 @@
 
 const esquemas = require('./esquemas');
 
-const partes = ['salud', 'auth', 'canchas', 'horarios', 'reservas', 'pagos', 'admin']
+const partes = ['salud', 'auth', 'canchas', 'horarios', 'reservas', 'pagos', 'admin', 'anuncios']
   .map(nombre => {
     try {
       return require(`./rutas/${nombre}`);
@@ -36,7 +36,8 @@ module.exports = {
     { name: 'Horarios', description: 'Tarifas, bloqueos y horas libres' },
     { name: 'Reservas' },
     { name: 'Pagos', description: 'Comprobantes Yape/Plin y aprobación del dueño' },
-    { name: 'Admin', description: 'Panel de administración (solo ADMIN)' }
+    { name: 'Admin', description: 'Panel de administración (solo ADMIN)' },
+    { name: 'Anuncios', description: 'Anuncios discretos de negocios del barrio' }
   ],
   components: {
     securitySchemes: { bearer: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } },

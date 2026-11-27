@@ -8,6 +8,8 @@
 const { Router } = require('express');
 const c = require('../controladores/admin');
 const esquemas = require('../validadores/admin');
+const anuncios = require('../controladores/anuncios');
+const esquemasAnuncios = require('../validadores/anuncios');
 const { idParam } = require('../validadores/comunes');
 const { validar } = require('../middleware/validar');
 const { autenticar, permitir } = require('../middleware/auth');
@@ -23,5 +25,11 @@ router.delete('/usuarios/:id', validar({ params: idParam }), c.eliminarUsuario);
 router.get('/reservas', validar({ query: esquemas.filtroReservas }), c.listarReservas);
 router.get('/resenas', c.listarResenas);
 router.delete('/resenas/:id', validar({ params: idParam }), c.eliminarResena);
+
+// Anuncios: CRUD con impresiones, clics y tasa de clics para cobrar al anunciante.
+router.get('/anuncios', anuncios.listar);
+router.post('/anuncios', validar({ body: esquemasAnuncios.crear }), anuncios.crear);
+router.patch('/anuncios/:id', validar({ params: idParam, body: esquemasAnuncios.actualizar }), anuncios.actualizar);
+router.delete('/anuncios/:id', validar({ params: idParam }), anuncios.eliminar);
 
 module.exports = router;

@@ -43,7 +43,8 @@ const RELACIONES = {
     resena: { tipo: 'unoInverso', modelo: 'resena', foranea: 'reservaId' }
   },
   pago: { reserva: { tipo: 'uno', modelo: 'reserva', local: 'reservaId' } },
-  resena: { reserva: { tipo: 'uno', modelo: 'reserva', local: 'reservaId' } }
+  resena: { reserva: { tipo: 'uno', modelo: 'reserva', local: 'reservaId' } },
+  anuncio: {}
 };
 
 // Valores por defecto (los mismos @default del schema.prisma).
@@ -54,7 +55,8 @@ const DEFECTOS = {
   bloqueo: () => ({ motivo: 'OTRO', nota: null }),
   reserva: () => ({ estado: 'PENDIENTE_PAGO', expiraEn: null, adelantoPerdido: false, canceladaEn: null }),
   pago: () => ({ estado: 'PENDIENTE', nota: null, revisadoEn: null }),
-  resena: () => ({ texto: null })
+  resena: () => ({ texto: null }),
+  anuncio: () => ({ enlace: null, imagenUrl: null, zona: null, activo: true, impresiones: 0, clics: 0 })
 };
 
 // Restricciones @unique / @@unique del schema.
