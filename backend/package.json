@@ -13,7 +13,8 @@
     "semilla": "node prisma/semilla.js",
     "test": "jest",
     "cobertura": "jest --coverage",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "crear-admin": "node scripts/crear-admin.js"
   },
   "prisma": {
     "seed": "node prisma/semilla.js"

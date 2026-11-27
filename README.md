@@ -302,18 +302,65 @@ Es el modelo de ingresos: el administrador vende el espacio por mes a negocios c
 
 ## Despliegue (Supabase + Render)
 
-Las cuentas las crea el dueño del proyecto; el repositorio no guarda ningún secreto.
+Todo es gratis y sin tarjeta. Las cuentas las crea el dueño del proyecto; el repositorio no guarda ningún secreto. Las 3 migraciones, la semilla y el script del primer admin están probados contra PostgreSQL real.
 
-1. **Supabase** (gratis):
-   - Crea un proyecto y copia, en *Project Settings → Database*, la cadena del **pooler** (puerto 6543, con `?pgbouncer=true`) para `DATABASE_URL` y la **directa** (puerto 5432) para `DIRECT_URL`.
-   - En *Storage*, crea un bucket **público** llamado `canchitas` y copia `SUPABASE_URL` y la `service_role key` para `SUPABASE_SERVICE_KEY`.
-2. **GitHub:** sube el repositorio. GitHub Actions correrá la CI.
-3. **Render** (gratis): elige *New → Blueprint*, selecciona el repositorio y Render leerá `render.yaml`. Llena las variables marcadas `sync: false`:
-   - `DATABASE_URL`, `DIRECT_URL` y los datos de Supabase.
-   - `FRONTEND_URL`: la URL de `tukanchitape-web`.
-   - `URL_PUBLICA`: la URL de `tukanchitape-api`.
-   - `VITE_API_URL` en el sitio estático: la URL de la API.
-4. **Datos iniciales (opcional):** con la `DIRECT_URL` de Supabase en tu `.env` local, corre `npm run semilla` una vez. La semilla se niega a correr con `NODE_ENV=production`.
+### 1. Supabase (base de datos y fotos)
+
+1. Crea un proyecto en https://supabase.com y guarda la contraseña de la base en un lugar seguro.
+2. En **Project Settings → Database → Connection string**, copia:
+   - **Transaction pooler** (puerto **6543**) y agrégale al final `?pgbouncer=true&connection_limit=1` → será `DATABASE_URL`.
+   - **Direct connection** (puerto **5432**) → será `DIRECT_URL` (la usa `prisma migrate`).
+3. En **Storage**, crea un bucket **público** llamado `canchitas`.
+4. En **Project Settings → API**, copia la **Project URL** (`SUPABASE_URL`) y la clave **service_role** (`SUPABASE_SERVICE_KEY`). Esa clave es secreta: solo va en Render, nunca en el frontend ni en GitHub.
+
+### 2. Datos iniciales (desde tu PC, una sola vez)
+
+Pon `DATABASE_URL` y `DIRECT_URL` de Supabase en `backend/.env` y corre, uno por uno:
+
+```powershell
+cd backend
+```
+
+```powershell
+npm run migrar:produccion
+```
+
+```powershell
+npm run semilla
+```
+
+La semilla carga las 5 canchas, las fotos de fondo y los usuarios de prueba (cambia sus contraseñas o desactívalos antes de mostrar la app al público). Para crear tu propia cuenta de administrador, con la contraseña en una variable (nunca dentro del comando):
+
+```powershell
+$env:ADMIN_PASSWORD = "tu-clave-larga"
+```
+
+```powershell
+npm run crear-admin -- tucorreo@ejemplo.com "Tu Nombre"
+```
+
+### 3. Render (API y frontend)
+
+1. En https://render.com entra con tu cuenta de GitHub y elige **New → Blueprint**.
+2. Selecciona el repositorio **Tuchanchitap**: Render lee `render.yaml` y propone dos servicios, `tukanchitape-api` y `tukanchitape-web`.
+3. Llena las variables marcadas `sync: false`:
+
+| Servicio | Variable | Valor |
+| --- | --- | --- |
+| tukanchitape-api | `DATABASE_URL`, `DIRECT_URL` | Las de Supabase (paso 1) |
+| tukanchitape-api | `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | Las de Supabase (paso 1) |
+| tukanchitape-api | `URL_PUBLICA` | `https://tukanchitape-api.onrender.com` (la URL que te dé Render) |
+| tukanchitape-api | `FRONTEND_URL` | `https://tukanchitape-web.onrender.com` |
+| tukanchitape-web | `VITE_API_URL` | `https://tukanchitape-api.onrender.com` |
+
+`JWT_SECRETO` lo genera Render solo. Si Render te asigna otras URL, usa esas y vuelve a desplegar el frontend (`VITE_API_URL` se lee al compilar).
+
+4. Comprueba:
+   - `https://…-api.onrender.com/salud` → responde `motor: "postgresql"` y `baseDatos: "ok"`.
+   - `https://…-api.onrender.com/docs` → Swagger.
+   - `https://…-web.onrender.com` → la app.
+
+**Plan gratis de Render:** la API "duerme" tras 15 minutos sin uso y la primera visita después tarda entre 30 y 50 segundos en despertar. Antes de una exposición, abre la app un minuto antes.
 
 ## Hoja de ruta
 

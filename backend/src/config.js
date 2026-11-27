@@ -30,6 +30,10 @@ if (!jwtSecreto) {
   if (!esPrueba) console.warn('[config] JWT_SECRETO vacío: se generó uno temporal para esta ejecución.');
 }
 
+// En producción no se permite el modo demo en memoria: perdería todo al
+// reiniciar. Si falta la base, mejor que el despliegue falle y se note.
+if (esProduccion && !process.env.DATABASE_URL?.trim()) throw new Error('Falta DATABASE_URL en las variables de entorno');
+
 const config = {
   entorno,
   esPrueba,

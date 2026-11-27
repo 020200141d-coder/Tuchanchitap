@@ -24,6 +24,10 @@ const { manejarErrores, noEncontrada } = require('./middleware/errores');
 
 const app = express();
 
+// En Render la API está detrás de un proxy: sin esto, express-rate-limit
+// vería la misma IP para todos y bloquearía a todos a la vez.
+if (config.esProduccion) app.set('trust proxy', 1);
+
 // Las imágenes de /uploads se muestran desde el frontend (otro origen), por
 // eso relajamos solo esa política de helmet.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
